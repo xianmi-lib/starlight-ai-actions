@@ -13,7 +13,19 @@ export const DEFAULT_PASTE: PasteProvider[] = [
   { name: '千问', href: 'https://www.qianwen.com/chat/', icon: 'qwen', bg: '#fff', scale: 0.75, ring: 'light' },
   { name: '元宝', href: 'https://yuanbao.tencent.com/', icon: 'yuanbao', bg: '#fff', scale: 0.75, ring: 'light' },
 ];
-export const DEFAULT_PROMPT = '我在阅读这篇文章（Markdown 格式）：{url}。请先阅读全文，然后帮我理解内容，并准备回答我的相关问题。';
+// 缺省 prompt 按页面语言三语（通用措辞，不含站点名）；用户可用 `prompt` 全局覆盖
+export const DEFAULT_PROMPTS: Record<'en' | 'zh-CN' | 'zh-TW', string> = {
+  en: "I'm reading this article (in Markdown): {url}. Please read it first, then help me understand the content and be ready to answer my questions.",
+  'zh-CN': '我在阅读这篇文章（Markdown 格式）：{url}。请先阅读全文，然后帮我理解内容，并准备回答我的相关问题。',
+  'zh-TW': '我在閱讀這篇文章（Markdown 格式）：{url}。請先全文閱讀，然後幫助我理解內容，並準備回答我的相關問題。',
+};
+
+// 选择序：frontmatter 逐页 > options.prompt 全局 > 按语言缺省（lang 精确命中，回退 en——与 mergeLabels 同款）
+export function resolvePrompt(fmPrompt: string | undefined, optionPrompt: string | undefined, lang: string): string {
+  if (fmPrompt) return fmPrompt;
+  if (optionPrompt) return optionPrompt;
+  return DEFAULT_PROMPTS[lang as keyof typeof DEFAULT_PROMPTS] ?? DEFAULT_PROMPTS.en;
+}
 
 export function renderPrompt(template: string, ctx: { url: string; title: string; lang: string; site: string }): string {
   return template.replaceAll('{url}', ctx.url).replaceAll('{title}', ctx.title).replaceAll('{lang}', ctx.lang).replaceAll('{site}', ctx.site);
@@ -35,13 +47,14 @@ export function validateOptions(raw: unknown): StarlightAiActionsOptions {
   const direct = o.direct === false ? false : (o.direct ?? DEFAULT_DIRECT);
   const paste = o.paste === false ? false : (o.paste ?? DEFAULT_PASTE);
   const dialog = o.dialog === false ? false : (o.dialog ?? {});
-  const prompt = o.prompt ?? DEFAULT_PROMPT;
+  // prompt 可缺省（缺省由 resolvePrompt 按页面语言取 DEFAULT_PROMPTS）；校验 {url} 依赖时按缺省模板（恒含 {url}）计
+  const prompt = o.prompt;
   const where = o.where ?? {};
   // prompt 模板仅在有按钮会渲染它（direct/paste 非空）时才构成对 {url} 的依赖；三组全关时 prompt 无处渲染，不应反向要求 mdUrl
   const promptUsed = (direct !== false && direct.length > 0) || (paste !== false && paste.length > 0);
   const usesUrl =
     (markdown !== false && markdown.items.length > 0) ||
-    (promptUsed && prompt.includes('{url}')) ||
+    (promptUsed && (prompt ?? DEFAULT_PROMPTS.en).includes('{url}')) ||
     direct !== false && direct.some((p) => p.href.includes('{url}'));
   if (usesUrl && !(markdown !== false && markdown.mdUrl)) {
     // markdown:false 时 mdUrl 无处可写——报错指路 `markdown: { items: [], mdUrl }`（关菜单但提供 URL）

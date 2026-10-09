@@ -15,6 +15,8 @@ const { mdHref, mdUrl, prompt, labels, markdownItems, direct, paste, dialogTitle
 const enc = encodeURIComponent(prompt);
 const renderHref = (tpl: string) => tpl.replaceAll('{prompt}', enc).replaceAll('{url}', encodeURIComponent(mdUrl));
 const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent: labels.copyContent, copyUrl: labels.copyUrl, copyPrompt: labels.copyPrompt };
+// 菜单图标 sprite id（v5 同款：view=ic-external、copyContent=ic-copy、copyUrl=ic-link、copyPrompt=ic-commentAlt）
+const itemIcon: Record<MarkdownItem, string> = { view: 'ic-external', copyContent: 'ic-copy', copyUrl: 'ic-link', copyPrompt: 'ic-commentAlt' };
 // spec §8：direct/paste 空数组或 false 视同关组；三组全关 → 整条按钮行不渲染（sr-only 播报区随之不渲染）
 const hasAnyGroup = markdownItems.length > 0 || (direct !== false && direct.length > 0) || (paste !== false && paste.length > 0);
 ---
@@ -22,12 +24,20 @@ const hasAnyGroup = markdownItems.length > 0 || (direct !== false && direct.leng
 <div class="page-actions-bar print:hidden" data-copy-success={labels.copySuccess} data-copy-fail={labels.copyFail}>
   {markdownItems.length > 0 && (
     <details class="pa-md" data-md-href={mdHref} data-md-url={mdUrl} data-prompt={prompt}>
-      <summary class="pa-btn">{labels.mdMenu}</summary>
+      <summary class="pa-btn" aria-label={labels.mdMenu}>
+        <svg aria-hidden="true"><use href={`${spriteUrl}#ic-markdown`}></use></svg>
+        <span class="pa-label">{labels.mdMenu}</span>
+        <svg class="pa-caret" aria-hidden="true"><use href={`${spriteUrl}#ic-caret`}></use></svg>
+      </summary>
       <div class="pa-md-menu">
         {markdownItems.map((item) => item === 'view' ? (
-          <a class="pa-md-item" href={mdHref} target="_blank" rel="noopener noreferrer" data-ai-action="view" data-action-url={mdHref}>{labels.view}</a>
+          <a class="pa-md-item" href={mdHref} target="_blank" rel="noopener noreferrer" data-ai-action="view" data-action-url={mdHref}>
+            <svg aria-hidden="true"><use href={`${spriteUrl}#${itemIcon[item]}`}></use></svg><span>{labels.view}</span>
+          </a>
         ) : (
-          <button type="button" class="pa-md-item" data-copy={item} data-ai-action={item}>{itemLabel[item]}</button>
+          <button type="button" class="pa-md-item" data-copy={item} data-ai-action={item}>
+            <svg aria-hidden="true"><use href={`${spriteUrl}#${itemIcon[item]}`}></use></svg><span>{itemLabel[item]}</span>
+          </button>
         ))}
       </div>
     </details>

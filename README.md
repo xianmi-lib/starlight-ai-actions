@@ -81,7 +81,7 @@ Top-level options (`StarlightAiActionsOptions`). All values are plain data (see 
 | `markdown` | `{ items?: MarkdownItem[]; mdUrl?: string } \| false` | `{ items: [view, copyContent, copyUrl, copyPrompt] }` | Markdown tools menu. `false` disables it. `items` picks the dropdown entries; `mdUrl` is the template for the page's Markdown URL (placeholders below). |
 | `direct` | `DirectProvider[] \| false` | ChatGPT + Claude lockups | Buttons that open a provider in a new tab. `false` or `[]` disables the group. |
 | `paste` | `PasteProvider[] \| false` | Gemini, Copilot, Poe, 豆包, 千问, 元宝 | Providers listed in the paste dialog (one stacked-avatar button + the dialog rows). `false` or `[]` disables the group. |
-| `prompt` | `string` | see [Default configuration](#default-configuration) | Prompt template used by `copyPrompt`, direct `href`s and the dialog. |
+| `prompt` | `string` | per-language (see [Default prompt](#default-prompt)) | Global prompt template used by `copyPrompt`, direct `href`s and the dialog. Omit it to use the built-in per-language default; set it to override that default for every language at once (cross-language sites then own the wording). Frontmatter `aiActions.prompt` still overrides per page. |
 | `where` | `{ idPattern?: string }` | `{}` | Page filter, see [`where.idPattern`](#whereidpattern). |
 | `labels` | `Record<string, Partial<Labels>>` | `{}` | Per-language label overrides keyed by page `lang` (e.g. `'zh-CN'`), see [Labels](#labels). |
 | `dialog` | `{ title?: string; hint1?: string } \| false` | `{}` | Paste dialog copy (overrides the `dialogTitle` / `dialogHint1` labels). `false` removes the dialog and requires `paste` empty (`false` or `[]`). |
@@ -182,7 +182,7 @@ The dialog renders iff `paste` is non-empty.
 
 Options are validated at config load; two mistakes throw:
 
-1. **`markdown.mdUrl` is required when anything needs the Markdown URL** — i.e. `markdown.items` is non-empty, **or** the `prompt` template contains `{url}` while `direct` or `paste` is non-empty, **or** any direct `href` contains `{url}`. (With all three groups off there is no consumer, so `mdUrl` is not required.) With `markdown: false` there is nowhere to put `mdUrl` — use `markdown: { items: [], mdUrl: '…' }` instead (empty `items` hides the menu but keeps the URL available).
+1. **`markdown.mdUrl` is required when anything needs the Markdown URL** — i.e. `markdown.items` is non-empty, **or** the effective prompt template contains `{url}` while `direct` or `paste` is non-empty (the per-language default always contains `{url}`), **or** any direct `href` contains `{url}`. (With all three groups off there is no consumer, so `mdUrl` is not required.) With `markdown: false` there is nowhere to put `mdUrl` — use `markdown: { items: [], mdUrl: '…' }` instead (empty `items` hides the menu but keeps the URL available).
 2. **`dialog: false` requires `paste` to be empty** (`false` or `[]`) — paste buttons only live inside the dialog.
 
 ## Events
@@ -225,12 +225,22 @@ starlightAiActions({
     { name: '千问', href: 'https://www.qianwen.com/chat/', icon: 'qwen', bg: '#fff', scale: 0.75, ring: 'light' },
     { name: '元宝', href: 'https://yuanbao.tencent.com/', icon: 'yuanbao', bg: '#fff', scale: 0.75, ring: 'light' },
   ],
-  prompt: '我在阅读这篇文章（Markdown 格式）：{url}。请先阅读全文，然后帮我理解内容，并准备回答我的相关问题。',
+  // prompt omitted → the built-in per-language default (see "Default prompt" below)
   where: {},
   labels: {},
   dialog: {},
 });
 ```
+
+### Default prompt
+
+When `prompt` is unset, the prompt follows the page language (`lang`, exact match with `en` / `zh-CN` / `zh-TW`, falls back to `en`) — the same lookup as [labels](#labels). Precedence: **frontmatter `aiActions.prompt` (per page) > `prompt` option (global, all languages) > per-language default**.
+
+| `lang` | Default prompt template |
+| --- | --- |
+| `en` | `I'm reading this article (in Markdown): {url}. Please read it first, then help me understand the content and be ready to answer my questions.` |
+| `zh-CN` | `我在阅读这篇文章（Markdown 格式）：{url}。请先阅读全文，然后帮我理解内容，并准备回答我的相关问题。` |
+| `zh-TW` | `我在閱讀這篇文章（Markdown 格式）：{url}。請先全文閱讀，然後幫助我理解內容，並準備回答我的相關問題。` |
 
 ## Limitations
 

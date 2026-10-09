@@ -1,7 +1,3 @@
----
-title: Hidden
-topic: demo
-aiActions: false
----
+# Hidden
 
 Hidden page. Its id matches `^(a|hidden)` but `aiActions: false` turns the bar off.

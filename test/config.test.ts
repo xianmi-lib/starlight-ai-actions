@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderPrompt, renderMdUrl, resolveShow, validateOptions } from '../src/config.js';
+import { DEFAULT_PROMPTS, renderPrompt, renderMdUrl, resolvePrompt, resolveShow, validateOptions } from '../src/config.js';
 
 describe('renderPrompt', () => {
   it('替换全部占位符', () => {
@@ -77,5 +77,30 @@ describe('validateOptions 边界', () => {
         dialog: false,
       }),
     ).toThrowError(/mdUrl/);
+  });
+});
+describe('DEFAULT_PROMPTS / resolvePrompt', () => {
+  it('三键齐全且各含 {url}（通用措辞）', () => {
+    expect(Object.keys(DEFAULT_PROMPTS).sort()).toEqual(['en', 'zh-CN', 'zh-TW']);
+    for (const tpl of Object.values(DEFAULT_PROMPTS)) expect(tpl).toContain('{url}');
+  });
+  it('frontmatter 逐页 prompt 优先', () => {
+    expect(resolvePrompt('FM {url}', 'OPT {url}', 'zh-CN')).toBe('FM {url}');
+    expect(resolvePrompt('FM {url}', undefined, 'en')).toBe('FM {url}');
+  });
+  it('无 frontmatter 时 options.prompt 全局覆盖（跨语言站自己负责）', () => {
+    expect(resolvePrompt(undefined, 'OPT {url}', 'zh-TW')).toBe('OPT {url}');
+    expect(resolvePrompt(undefined, 'OPT {url}', 'en')).toBe('OPT {url}');
+  });
+  it('两者皆缺按 lang 精确命中取缺省，未知 lang 回退 en', () => {
+    expect(resolvePrompt(undefined, undefined, 'en')).toBe(DEFAULT_PROMPTS.en);
+    expect(resolvePrompt(undefined, undefined, 'zh-CN')).toBe(DEFAULT_PROMPTS['zh-CN']);
+    expect(resolvePrompt(undefined, undefined, 'zh-TW')).toBe(DEFAULT_PROMPTS['zh-TW']);
+    expect(resolvePrompt(undefined, undefined, 'zh-Hans')).toBe(DEFAULT_PROMPTS.en);
+    expect(resolvePrompt(undefined, undefined, '')).toBe(DEFAULT_PROMPTS.en);
+  });
+  it('validateOptions 不再代填 prompt（缺省留给 resolvePrompt 按语言取）', () => {
+    const o = validateOptions({ markdown: { mdUrl: '/md/{filePath}' } });
+    expect(o.prompt).toBeUndefined();
   });
 });

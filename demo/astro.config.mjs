@@ -18,9 +18,18 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'AI Actions Demo',
+      // 三语演示（prompt/labels 按页面语言分发的复验夹具）：root=English（默认在 /），
+      // zh-cn / zh-tw 各带 Starlight `lang` 精确码（DEFAULT_PROMPTS/labels 的键）
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        'zh-cn': { label: '简体中文', lang: 'zh-CN' },
+        'zh-tw': { label: '正體中文', lang: 'zh-TW' },
+      },
       plugins: [
         starlightThemeLargePrint({ font: 'noto-serif-sc' }),
-        // sidebar-topics 工厂禁止顶层 sidebar 配置（会 throw）：原 sidebar 条目收进 topics
+        // sidebar-topics 工厂禁止顶层 sidebar 配置（会 throw）：原 sidebar 条目收进 topics。
+        // items 用 link 型（非 slug 型）：slug 型会按当前 locale 重解析（slug 'a' → zh-cn 下查 'zh-cn/a'），
+        // 多语言下缺镜像页直接 throw；link 型只按 locale 加前缀不查内容库。页归属走各页 frontmatter `topic`
         starlightSidebarTopics([
           {
             label: 'Demo',
@@ -28,9 +37,9 @@ export default defineConfig({
             icon: 'open-book',
             link: '/a/',
             items: [
-              { label: 'A', slug: 'a' },
-              { label: 'Hidden', slug: 'hidden' },
-              { label: 'Custom prompt', slug: 'custom-prompt' },
+              { label: 'A', link: '/a/' },
+              { label: 'Hidden', link: '/hidden/' },
+              { label: 'Custom prompt', link: '/custom-prompt/' },
             ],
           },
           {
@@ -39,21 +48,21 @@ export default defineConfig({
             icon: 'document',
             link: '/',
             items: [
-              { label: 'Home', slug: 'index' },
-              { label: 'Index page', slug: 'index-page' },
-              { label: 'Guides', slug: 'guides' },
+              { label: 'Home', link: '/' },
+              { label: 'Index page', link: '/index-page/' },
+              { label: 'Guides', link: '/guides/' },
             ],
           },
         ]),
         starlightAiActions({
-          markdown: { items: ['view', 'copyContent', 'copyUrl', 'copyPrompt'], mdUrl: '{site}{base}/md/{filePath}' },
-          // 第三个 combine 用豆包位图，暴露 .pa-combine .pa-icon-img 位图锁标路径（v5 无对照的泛化路径，Task 11 目测用）
+          // {base}/md/{filePath} 同源相对路径：demo 在 public/md/ 提供 raw markdown 真源
+          markdown: { items: ['view', 'copyContent', 'copyUrl', 'copyPrompt'], mdUrl: '{base}/md/{filePath}' },
+          // 两个 combine 锁标（豆包位图夹具已撤，位图路径仍由 paste 叠钮里的豆包头像覆盖）
           direct: [
             { name: 'ChatGPT', href: 'https://chatgpt.com/?prompt={prompt}', icon: 'chatgpt', style: 'combine' },
             { name: 'Claude', href: 'https://claude.ai/new?q={prompt}', icon: 'claude', style: 'combine' },
-            { name: '豆包', href: 'https://www.doubao.com/chat/', icon: 'doubao', style: 'combine' },
           ],
-          where: { idPattern: '^(a|hidden|custom-prompt)' },
+          where: { idPattern: '^(a|hidden|custom-prompt|zh-cn/demo|zh-tw/demo)' },
         }),
       ],
     }),

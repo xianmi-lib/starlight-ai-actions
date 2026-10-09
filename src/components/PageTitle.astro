@@ -4,7 +4,7 @@ import AiActionsBar from './AiActionsBar.astro';
 import AiDialog from './AiDialog.astro';
 import options from 'virtual:starlight-ai-actions/options';
 import { mergeLabels } from '../labels.js';
-import { renderMdUrl, renderPrompt, resolveShow } from '../config.js';
+import { renderMdUrl, renderPrompt, resolvePrompt, resolveShow } from '../config.js';
 const { entry, lang } = (Astro.locals as any).starlightRoute;
 const fm = entry.data.aiActions;
 const show = fm !== false && resolveShow(entry, options.where ?? {});
@@ -12,8 +12,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const site = Astro.site ? String(Astro.site).replace(/\/$/, '') : '';
 const mdUrlTpl = options.markdown === false ? '' : (options.markdown.mdUrl ?? '');
 const mdHref = mdUrlTpl ? renderMdUrl(mdUrlTpl, { base, filePath: (entry.filePath ?? '').replace(/^src\/content\/docs\//, ''), site }) : '';
-// frontmatter `aiActions: { prompt }` 逐页覆盖全局 prompt 模板（false/缺省时用全局）
-const promptTemplate = (typeof fm === 'object' && fm?.prompt) ? fm.prompt : (options.prompt ?? '');
+// prompt 选择序：frontmatter `aiActions: { prompt }` 逐页 > options.prompt 全局 > 按页面语言缺省三语
+const promptTemplate = resolvePrompt(typeof fm === 'object' ? fm?.prompt : undefined, options.prompt, lang ?? 'en');
 const prompt = renderPrompt(promptTemplate, { url: mdHref, title: entry.data.title ?? '', lang: lang ?? 'en', site });
 const labels = mergeLabels(lang ?? 'en', options.labels);
 const dialogTitle = options.dialog === false ? '' : (options.dialog?.title ?? labels.dialogTitle);
