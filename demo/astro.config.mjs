@@ -18,18 +18,16 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'AI Actions Demo',
-      // 三语演示（prompt/labels 按页面语言分发的复验夹具）：root=English（默认在 /），
-      // zh-cn / zh-tw 各带 Starlight `lang` 精确码（DEFAULT_PROMPTS/labels 的键）
+      // demo 统一英语（用户 2026-10-09 拍板：教程+demo 只英语；三语 prompt/labels 由
+      // 单测覆盖，生产站中文页面自然命中 zh-CN/zh-TW 缺省）
       locales: {
         root: { label: 'English', lang: 'en' },
-        'zh-cn': { label: '简体中文', lang: 'zh-CN' },
-        'zh-tw': { label: '正體中文', lang: 'zh-TW' },
       },
       plugins: [
         starlightThemeLargePrint({ font: 'noto-serif-sc' }),
         // sidebar-topics 工厂禁止顶层 sidebar 配置（会 throw）：原 sidebar 条目收进 topics。
-        // items 用 link 型（非 slug 型）：slug 型会按当前 locale 重解析（slug 'a' → zh-cn 下查 'zh-cn/a'），
-        // 多语言下缺镜像页直接 throw；link 型只按 locale 加前缀不查内容库。页归属走各页 frontmatter `topic`
+        // items 用 link 型（非 slug 型）：slug 型会按当前 locale 重解析、缺镜像页直接 throw；
+        // link 型只按 locale 加前缀不查内容库。页归属走各页 frontmatter `topic`
         starlightSidebarTopics([
           {
             label: 'Demo',
@@ -62,7 +60,7 @@ export default defineConfig({
             { name: 'ChatGPT', href: 'https://chatgpt.com/?prompt={prompt}', icon: 'chatgpt', style: 'combine' },
             { name: 'Claude', href: 'https://claude.ai/new?q={prompt}', icon: 'claude', style: 'combine' },
           ],
-          where: { idPattern: '^(a|hidden|custom-prompt|zh-cn/demo|zh-tw/demo)' },
+          where: { idPattern: '^(a|hidden|custom-prompt)' },
         }),
       ],
     }),
