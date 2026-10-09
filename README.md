@@ -84,7 +84,7 @@ Top-level options (`StarlightAiActionsOptions`). All values are plain data (see 
 | `prompt` | `string` | see [Default configuration](#default-configuration) | Prompt template used by `copyPrompt`, direct `href`s and the dialog. |
 | `where` | `{ idPattern?: string }` | `{}` | Page filter, see [`where.idPattern`](#whereidpattern). |
 | `labels` | `Record<string, Partial<Labels>>` | `{}` | Per-language label overrides keyed by page `lang` (e.g. `'zh-CN'`), see [Labels](#labels). |
-| `dialog` | `{ title?: string; hint1?: string } \| false` | `{}` | Paste dialog copy (overrides the `dialogTitle` / `dialogHint1` labels). `false` removes the dialog and requires `paste: []`. |
+| `dialog` | `{ title?: string; hint1?: string } \| false` | `{}` | Paste dialog copy (overrides the `dialogTitle` / `dialogHint1` labels). `false` removes the dialog and requires `paste` empty (`false` or `[]`). |
 
 Group semantics: an empty array is the same as `false`. When all three groups are empty/disabled, nothing is rendered on the page.
 
@@ -105,10 +105,12 @@ Group semantics: an empty array is the same as `false`. When all three groups ar
 | `href` | `string` | — (required) | Target URL. Supports `{prompt}` and `{url}` (both substituted URL-encoded). |
 | `icon` | `string` | — (required) | Sprite symbol name without the `ic-` prefix: `chatgpt`, `claude`, `gemini`, `copilot`, `poe`, `qwen`, `yuanbao`; `doubao` uses the bundled PNG instead of the sprite. |
 | `iconUrl` | `string?` | — | Custom image URL; overrides `icon`. Rendered as `<img>`. |
-| `bg` | `string?` | `'#fff'` | Avatar background color. |
-| `scale` | `number?` | `0.75` | Icon scale inside the avatar. |
-| `ring` | `'light' \| 'dark'?` | `'light'` | Inset ring around the avatar. |
+| `bg` | `string?` | `'#fff'` | Avatar chip background color (see note). |
+| `scale` | `number?` | `0.75` | Icon scale inside the avatar (see note). |
+| `ring` | `'light' \| 'dark'?` | `'light'` on direct bitmaps; none on paste | Inset ring around the avatar (see note). |
 | `style` | `'combine' \| 'round' \| 'square'?` | `'round'` | **`direct` only.** `combine` = icon + name lockup; anything else = avatar round button (see [Limitations](#limitations) for `square`). |
+
+`bg` / `scale` / `ring` style the avatar. On **direct** buttons they only apply to the `<img>` (bitmap) path (`iconUrl` or the bundled Doubao PNG) — sprite icons render bare and ignore all three. On **paste** stacked avatars `bg` / `scale` apply to the chip and its icon (bitmap or sprite), and `ring` is opt-in: omitting it renders no ring (the `'light'` default is the direct/AiIcon path, not the stacked button).
 
 ### Template placeholders
 
@@ -116,7 +118,7 @@ Group semantics: an empty array is the same as `false`. When all three groups ar
 | --- | --- | --- |
 | `{base}` | `import.meta.env.BASE_URL` without trailing slash | `markdown.mdUrl` |
 | `{filePath}` | content file path relative to `src/content/docs/` | `markdown.mdUrl` |
-| `{site}` | `Astro.site` origin without trailing slash | `markdown.mdUrl`, `prompt` |
+| `{site}` | `String(Astro.site)` without a trailing slash | `markdown.mdUrl`, `prompt` |
 | `{url}` | rendered Markdown URL | `prompt`, provider `href` |
 | `{title}` | page title | `prompt` |
 | `{lang}` | page language code | `prompt` |
@@ -180,8 +182,8 @@ The dialog renders iff `paste` is non-empty.
 
 Options are validated at config load; two mistakes throw:
 
-1. **`markdown.mdUrl` is required when anything needs the Markdown URL** — i.e. `markdown.items` is non-empty, or the rendered `prompt` contains `{url}` while at least one direct/paste button will render it, or any direct `href` contains `{url}`. (A `{url}` that never reaches a rendered button creates no dependency.)
-2. **`dialog: false` requires `paste: []`** — paste buttons only live inside the dialog.
+1. **`markdown.mdUrl` is required when anything needs the Markdown URL** — i.e. `markdown.items` is non-empty, **or** the `prompt` template contains `{url}` while `direct` or `paste` is non-empty, **or** any direct `href` contains `{url}`. (With all three groups off there is no consumer, so `mdUrl` is not required.)
+2. **`dialog: false` requires `paste` to be empty** (`false` or `[]`) — paste buttons only live inside the dialog.
 
 ## Events
 
@@ -232,14 +234,14 @@ starlightAiActions({
 
 ## Limitations
 
-- **Options must be serializable plain data** — they reach the client through a Vite virtual module (`JSON.stringify`), so functions and class instances are dropped.
-- **Icon backgrounds are inline styles.** `bg` is applied as `style="background:…"` and wins over CSS. In `combine` form a bitmap `iconUrl` needs `bg="transparent"` (bare-logo lockup) — the component already renders `combine` with `bg="transparent"`, so provider `bg` / `scale` / `ring` only take effect on the round/square avatar form.
+- **Options must be serializable plain data** — they reach the client through a Vite virtual module (`JSON.stringify`): functions are dropped, class instances are flattened to plain objects.
+- **Icon backgrounds are inline styles.** `bg` is applied as `style="background:…"` and wins over CSS. In `combine` form a bitmap `iconUrl` needs `bg="transparent"` (bare-logo lockup) — the component already renders `combine` with `bg="transparent"`, so for `direct` providers `bg` / `scale` / `ring` only take effect on the round/square avatar form.
 - **`style: 'square'` currently renders the round avatar form** (the square corner rule exists but is not wired to a style value yet).
 - **`PageTitle` override.** The bar is injected via a Starlight `PageTitle` component override; if your site already overrides `PageTitle`, your override wins and the bar will not render unless you render `AiActionsBar` yourself.
 
 ## Trademarks
 
-All product names and brand icons are trademarks of their respective owners, referenced nominatively. Brand marks in the bundled sprite come from [lobe-icons](https://github.com/lobehub/lobe-icons) (MIT); utility icons from [simple-icons](https://simpleicons.org/) (CC0).
+All product names and brand icons are trademarks of their respective owners, referenced nominatively. Brand marks in the bundled sprite come from [lobe-icons](https://github.com/lobehub/lobe-icons) (MIT, nominative use); `markdown` and `copy` from [simple-icons](https://simpleicons.org/) (CC0); `comment-alt` is a Starlight built-in icon (MIT).
 
 ## License
 
