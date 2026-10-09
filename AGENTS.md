@@ -18,7 +18,13 @@
 - **部署唯一通道 = CF Workers Builds 自动部署**（2026-10-09 用户配置，push 到 main 触发；照 starlight-theme-large-print 模式）。**本地 `npm run deploy` 已退役，禁止本地/CF 双轨部署**（产物 hash 随环境不同，双轨会让资产频繁翻滚）。云端 deploy 只更新资产不动路由（路由在 `demo/wrangler.jsonc`）。手动重触发用 deploy hook（配置见 CF 控制台 Builds）。
 - 门槛矩阵（`class="page-actions-bar"` 口径）：`…/starlight-ai-actions/a/`=1、`…/starlight-ai-actions/`=0（index=教程页，index 页恒不渲染按钮条）、`…/starlight-ai-actions/hidden/`=0（frontmatter `aiActions: false`）、`…/starlight-ai-actions/custom-prompt/`=CUSTOM（frontmatter prompt 覆盖生效）。
 
-## 发布流程（未执行）
+## 发布流程（已执行记录）
 
-- **npm 发布**：0.1.0 发布就绪（35 单测绿、tsc 干净），`npm publish --access public` **待用户放行**。token 在用户侧 `~/.npmrc`，值不落任何文件；publish 成功后 `npm view` 约 1–2 分钟才转绿，勿立刻误判失败。
-- **官方收录（待提）**：按 [withastro/starlight CONTRIBUTING](https://github.com/withastro/starlight/blob/main/CONTRIBUTING.md) 插件列表 PR（前提=包已上 npm）；listing href 指 `https://www.xianmi.co/starlight-ai-actions/`（本仓 worker 服务）。
+- **npm 0.1.0（2026-10-09 首发）**：`npm publish --access public` 成功（16 文件）。token 在用户侧 `~/.npmrc`，值不落任何文件。**坑两条**：①本机 npm 走 registry 会遇自签证书注入（`DEPTH_ZERO_SELF_SIGNED_CERT`），解法=`NODE_OPTIONS=--use-system-ca`（走系统 CA，勿关 TLS 校验）；②granular token 若只授权既有三包，新包首发报 403 "You may not perform that action with these credentials"——需用户在 npm 站给 token 加包权限/开 create new packages。publish 成功后 `npm view` 约 1–2 分钟才转绿。
+- **官方收录 PR（已提）**：[withastro/starlight#4254](https://github.com/withastro/starlight/pull/4254)（`docs: add starlight-ai-actions to community plugins`，2026-10-09）。listing href=`https://www.xianmi.co/starlight-ai-actions/`（本仓 worker 服务）；PR 描述写明 official docs page + MIT + 商标注记。**兜底**：reviewer 若坚持 href 指仓库，改一行重推。
+
+## 已踩过的坑（部署/依赖）
+
+- **file: 兄弟仓依赖会炸 CF Builds**（2026-10-09 两次构建失败实证）：demo 曾以 `file:../../starlight-theme-large-print/...` 引用兄弟仓（共存验证），云端 checkout 无仓外路径，config 加载即 `Cannot find module`；即便仓内 `file:..`（本插件自身）也有坑——npm 装成符号链接后，插件内 `import '@astrojs/starlight/…'` 从**真实路径**（仓库根）向上解析、云端根目录无 node_modules 而失败。**定稿：demo 依赖一律 registry 形态**（`starlight-ai-actions@^0.1.0` + theme/font `^0.4.2`），与真实用户安装形态一致，两类问题同时根治。本地迭代插件源码时 demo 不会热更（registry 快照），临时改 `file:..` 验完记得改回。
+- **npm file: 依赖惰性保留**：`file:..` 链接的包版本恰满足 semver 范围（如 0.1.0 满足 ^0.1.0）时，改 package.json 后 `npm install` 不会重解析——须显式 `npm install starlight-ai-actions@^0.1.0` 强制落 registry。
+- **门槛测试夹具勿露公网**：guides/index-page 两夹具页曾随 demo 文档站化混进 sidebar（2026-10-09 删）；新夹具页放 sidebar 之前先想清楚它是内容还是验证桩。
