@@ -20,7 +20,7 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'AI Actions Demo',
+      title: 'Starlight AI Actions',
       // demo 统一英语（用户 2026-10-09 拍板：教程+demo 只英语；三语 prompt/labels 由
       // 单测覆盖，生产站中文页面自然命中 zh-CN/zh-TW 缺省）
       locales: {
