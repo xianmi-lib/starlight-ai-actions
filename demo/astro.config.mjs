@@ -30,6 +30,7 @@ export default defineConfig({
             items: [
               { label: 'A', slug: 'a' },
               { label: 'Hidden', slug: 'hidden' },
+              { label: 'Custom prompt', slug: 'custom-prompt' },
             ],
           },
           {
@@ -52,7 +53,7 @@ export default defineConfig({
             { name: 'Claude', href: 'https://claude.ai/new?q={prompt}', icon: 'claude', style: 'combine' },
             { name: '豆包', href: 'https://www.doubao.com/chat/', icon: 'doubao', style: 'combine' },
           ],
-          where: { idPattern: '^(a|hidden)' },
+          where: { idPattern: '^(a|hidden|custom-prompt)' },
         }),
       ],
     }),

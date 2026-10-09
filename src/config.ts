@@ -44,10 +44,17 @@ export function validateOptions(raw: unknown): StarlightAiActionsOptions {
     (promptUsed && prompt.includes('{url}')) ||
     direct !== false && direct.some((p) => p.href.includes('{url}'));
   if (usesUrl && !(markdown !== false && markdown.mdUrl)) {
-    throw new Error('[starlight-ai-actions] 缺少 markdown.mdUrl 模板：{url}/{filePath} 占位符与 view/copy 项都依赖它。');
+    // markdown:false 时 mdUrl 无处可写——报错指路 `markdown: { items: [], mdUrl }`（关菜单但提供 URL）
+    const hint =
+      markdown === false || markdown.items.length === 0
+        ? ' To hide the Markdown menu while still supplying the URL, use `markdown: { items: [], mdUrl: \'…\' }`.'
+        : '';
+    throw new Error(
+      '[starlight-ai-actions] Missing `markdown.mdUrl` template: the `mdUrl`/`{url}` placeholders and the view/copy items all depend on it.' + hint,
+    );
   }
   if (dialog === false && paste !== false && paste.length > 0) {
-    throw new Error('[starlight-ai-actions] dialog:false 时 paste 必须为空（粘贴型按钮只能活在 dialog 里）。');
+    throw new Error('[starlight-ai-actions] `dialog: false` requires `paste` to be empty (paste-type buttons only live inside the dialog).');
   }
   return { markdown, direct, paste, prompt, where, labels: o.labels ?? {}, dialog };
 }

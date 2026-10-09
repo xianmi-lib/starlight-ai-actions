@@ -86,7 +86,7 @@ Top-level options (`StarlightAiActionsOptions`). All values are plain data (see 
 | `labels` | `Record<string, Partial<Labels>>` | `{}` | Per-language label overrides keyed by page `lang` (e.g. `'zh-CN'`), see [Labels](#labels). |
 | `dialog` | `{ title?: string; hint1?: string } \| false` | `{}` | Paste dialog copy (overrides the `dialogTitle` / `dialogHint1` labels). `false` removes the dialog and requires `paste` empty (`false` or `[]`). |
 
-Group semantics: an empty array is the same as `false`. When all three groups are empty/disabled, nothing is rendered on the page.
+Group semantics: for **rendering**, an empty array is the same as `false` — when all three groups are empty/disabled, nothing is rendered on the page. One exception: `markdown: { items: [], mdUrl }` is still the legal carrier of `mdUrl` — it hides the Markdown menu while keeping the Markdown URL available to `{url}` / direct `href`s.
 
 ### `markdown.items`
 
@@ -182,7 +182,7 @@ The dialog renders iff `paste` is non-empty.
 
 Options are validated at config load; two mistakes throw:
 
-1. **`markdown.mdUrl` is required when anything needs the Markdown URL** — i.e. `markdown.items` is non-empty, **or** the `prompt` template contains `{url}` while `direct` or `paste` is non-empty, **or** any direct `href` contains `{url}`. (With all three groups off there is no consumer, so `mdUrl` is not required.)
+1. **`markdown.mdUrl` is required when anything needs the Markdown URL** — i.e. `markdown.items` is non-empty, **or** the `prompt` template contains `{url}` while `direct` or `paste` is non-empty, **or** any direct `href` contains `{url}`. (With all three groups off there is no consumer, so `mdUrl` is not required.) With `markdown: false` there is nowhere to put `mdUrl` — use `markdown: { items: [], mdUrl: '…' }` instead (empty `items` hides the menu but keeps the URL available).
 2. **`dialog: false` requires `paste` to be empty** (`false` or `[]`) — paste buttons only live inside the dialog.
 
 ## Events

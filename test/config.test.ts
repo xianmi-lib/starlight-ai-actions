@@ -55,4 +55,27 @@ describe('validateOptions 边界', () => {
     const o = validateOptions({ markdown: { mdUrl: '/md/{filePath}', items: [] }, direct: false, paste: false, dialog: false });
     expect(o.markdown === false ? undefined : o.markdown?.items).toEqual([]);
   });
+  it('direct href 含 {url} 分句单独钉（prompt 无 {url} 仍抛）+ markdown:false 报错含 items: [] 指路', () => {
+    const cfg = () =>
+      validateOptions({
+        markdown: false,
+        prompt: '读 {title}',
+        direct: [{ name: 'X', href: 'https://x.test/?u={url}', icon: 'chatgpt' }],
+        paste: false,
+        dialog: false,
+      });
+    expect(cfg).toThrowError(/mdUrl/);
+    expect(cfg).toThrowError(/items: \[\]/);
+  });
+  it('promptUsed 分句单独钉（items 空、direct 非空、prompt 含 {url} 仍抛 mdUrl）', () => {
+    expect(() =>
+      validateOptions({
+        markdown: { mdUrl: undefined, items: [] },
+        prompt: '读 {url}',
+        direct: [{ name: 'X', href: 'https://x.test/', icon: 'chatgpt' }],
+        paste: false,
+        dialog: false,
+      }),
+    ).toThrowError(/mdUrl/);
+  });
 });

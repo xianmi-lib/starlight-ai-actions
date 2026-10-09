@@ -12,7 +12,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const site = Astro.site ? String(Astro.site).replace(/\/$/, '') : '';
 const mdUrlTpl = options.markdown === false ? '' : (options.markdown.mdUrl ?? '');
 const mdHref = mdUrlTpl ? renderMdUrl(mdUrlTpl, { base, filePath: (entry.filePath ?? '').replace(/^src\/content\/docs\//, ''), site }) : '';
-const prompt = renderPrompt(options.prompt ?? '', { url: mdHref, title: entry.data.title ?? '', lang: lang ?? 'en', site });
+// frontmatter `aiActions: { prompt }` 逐页覆盖全局 prompt 模板（false/缺省时用全局）
+const promptTemplate = (typeof fm === 'object' && fm?.prompt) ? fm.prompt : (options.prompt ?? '');
+const prompt = renderPrompt(promptTemplate, { url: mdHref, title: entry.data.title ?? '', lang: lang ?? 'en', site });
 const labels = mergeLabels(lang ?? 'en', options.labels);
 const dialogTitle = options.dialog === false ? '' : (options.dialog?.title ?? labels.dialogTitle);
 const hint1 = options.dialog === false ? '' : (options.dialog?.hint1 ?? labels.dialogHint1);
