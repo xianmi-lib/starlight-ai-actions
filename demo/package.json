@@ -9,7 +9,10 @@
   "dependencies": {
     "@astrojs/starlight": "^0.42.0",
     "astro": "^7.3.1",
-    "starlight-ai-actions": "file:.."
+    "starlight-ai-actions": "file:..",
+    "starlight-sidebar-topics": "^0.9.0",
+    "starlight-theme-large-print": "file:../../starlight-theme-large-print/packages/theme",
+    "starlight-theme-large-print-font-noto-serif-sc": "file:../../starlight-theme-large-print/packages/font-noto-serif-sc"
   },
   "devDependencies": {
     "playwright": "^1.64.0"
