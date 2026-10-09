@@ -62,6 +62,8 @@ const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent
       </span>
     </button>
   )}
+  {/* 屏幕阅读器播报区（v5 同款，Task 9 脚本 root.querySelector('.pa-live') 依赖） */}
+  <span class="sr-only pa-live" aria-live="polite" aria-atomic="true"></span>
 </div>
 
 <style>
