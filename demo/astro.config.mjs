@@ -44,8 +44,6 @@ export default defineConfig({
                 { label: 'A', link: '/a/' },
                 { label: 'Hidden', link: '/hidden/' },
                 { label: 'Custom prompt', link: '/custom-prompt/' },
-                { label: 'Index page', link: '/index-page/' },
-                { label: 'Guides', link: '/guides/' },
               ],
             },
           ],
