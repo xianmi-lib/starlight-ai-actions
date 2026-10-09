@@ -4,6 +4,22 @@
   "description": "Starlight page actions: Markdown tools menu and AI-discuss buttons with a paste-prompt dialog.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xianmi-lib/starlight-ai-actions.git"
+  },
+  "keywords": [
+    "starlight",
+    "starlight-plugin",
+    "astro",
+    "ai",
+    "llm",
+    "chatgpt",
+    "claude",
+    "markdown",
+    "docs",
+    "documentation"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./schema": "./src/schema.ts",
