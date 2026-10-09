@@ -1,0 +1,21 @@
+---
+import spriteUrl from '../assets/icons.svg?url';
+import doubaoUrl from '../assets/doubao.png?url';
+interface Props {
+  icon: string;
+  iconUrl?: string;
+  size?: number;
+  bg?: string;
+  scale?: number;
+  ring?: 'light' | 'dark';
+}
+const { icon, iconUrl, size = 24, bg = '#fff', scale = 0.75, ring = 'light' } = Astro.props;
+const isBitmap = icon === 'doubao';
+const src = iconUrl ?? (isBitmap ? doubaoUrl : undefined);
+const inner = Math.round(size * scale);
+---
+{src ? (
+  <img class="pa-icon-img" src={src} alt="" width={inner} height={inner} style={`background:${bg};`} data-ring={ring} />
+) : (
+  <svg class="pa-icon-svg" width={size} height={size} aria-hidden="true"><use href={`${spriteUrl}#ic-${icon}`}></use></svg>
+)}

@@ -1,0 +1,242 @@
+---
+import AiIcon from './AiIcon.astro';
+import spriteUrl from '../assets/icons.svg?url';
+import doubaoUrl from '../assets/doubao.png?url';
+import type { DirectProvider, PasteProvider, Labels, MarkdownItem } from '../types.js';
+interface Props {
+  mdHref: string; mdUrl: string; prompt: string;
+  labels: Labels;
+  markdownItems: MarkdownItem[];
+  direct: DirectProvider[] | false;
+  paste: PasteProvider[] | false;
+  dialogTitle: string;
+}
+const { mdHref, mdUrl, prompt, labels, markdownItems, direct, paste, dialogTitle } = Astro.props;
+const enc = encodeURIComponent(prompt);
+const renderHref = (tpl: string) => tpl.replaceAll('{prompt}', enc).replaceAll('{url}', encodeURIComponent(mdUrl));
+const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent: labels.copyContent, copyUrl: labels.copyUrl, copyPrompt: labels.copyPrompt };
+---
+<div class="page-actions-bar print:hidden" data-copy-success={labels.copySuccess} data-copy-fail={labels.copyFail}>
+  {markdownItems.length > 0 && (
+    <details class="pa-md" data-md-href={mdHref} data-md-url={mdUrl} data-prompt={prompt}>
+      <summary class="pa-btn">{labels.mdMenu}</summary>
+      <div class="pa-md-menu">
+        {markdownItems.map((item) => item === 'view' ? (
+          <a class="pa-md-item" href={mdHref} data-ai-action="view" data-action-url={mdHref}>{labels.view}</a>
+        ) : (
+          <button type="button" class="pa-md-item" data-copy={item} data-ai-action={item}>{itemLabel[item]}</button>
+        ))}
+      </div>
+    </details>
+  )}
+  {direct && direct.map((p) => (
+    p.style === 'combine' ? (
+      <a class="pa-btn pa-combine" href={renderHref(p.href)} data-ai-action="open" data-provider={p.name} aria-label={p.name}>
+        <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} /><span class="pa-combine-text">{p.name}</span>
+      </a>
+    ) : (
+      <a class="pa-btn pa-ai pa-ai-round" href={renderHref(p.href)} data-ai-action="open" data-provider={p.name} aria-label={p.name}>
+        <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={40} bg={p.bg} scale={p.scale} ring={p.ring} />
+      </a>
+    )
+  ))}
+  {paste && paste.length > 0 && (
+    <button type="button" class="pa-btn pa-ai pa-ai-round" data-prompt={prompt} aria-haspopup="dialog" aria-label={labels.pasteOpen} data-ai-action="open">
+      {/* paste 圆钮 v5 形态=6 头像叠成一钮（pa-ai-icons > pa-av×N，lobe IconAvatar 规格），
+          照 v5 视觉抄；按钮本体的 DOM 契约不变。dialog 内全排由 Task 8 承担 */}
+      <span class="pa-ai-icons" aria-hidden="true">
+        {paste.map((m) => {
+          const src = m.iconUrl ?? (m.icon === 'doubao' ? doubaoUrl : undefined);
+          return (
+            <span class:list={['pa-av', { 'pa-av-ring-light': m.ring === 'light', 'pa-av-ring-dark': m.ring === 'dark' }]} style={`background:${m.bg ?? '#fff'}`}>
+              {src ? (
+                <img src={src} alt="" decoding="async" style={`transform:scale(${m.scale ?? 0.75})`} />
+              ) : (
+                <svg class="pa-av-svg" style={`transform:scale(${m.scale ?? 0.75})`}>
+                  <use href={`${spriteUrl}#ic-${m.icon}`}></use>
+                </svg>
+              )}
+            </span>
+          );
+        })}
+      </span>
+    </button>
+  )}
+</div>
+
+<style>
+  @layer starlight.core {
+    .page-actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem 0.75rem;
+      margin-top: 0.75rem;
+    }
+    /* 控件族 ghost 风格：透明底灰字、hover accent，安静不抢眼 */
+    .pa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      border: 0;
+      border-radius: 0.375rem;
+      background: none;
+      color: var(--sl-color-gray-2);
+      font-family: inherit;
+      font-size: var(--sl-text-sm);
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .pa-btn:is(:hover, :focus-visible) {
+      color: var(--sl-color-accent-high);
+    }
+    .pa-btn svg {
+      width: 1rem;
+      height: 1rem;
+    }
+    /* Markdown 合并下拉（2026-10-08）：details/summary 原生开合 + JS 外点收合 */
+    .pa-md {
+      position: relative;
+    }
+    .pa-md > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    .pa-md > summary::-webkit-details-marker {
+      display: none;
+    }
+    .pa-caret {
+      width: 0.75rem !important;
+      height: 0.75rem !important;
+      opacity: 0.7;
+    }
+    .pa-md-menu {
+      position: absolute;
+      top: calc(100% + 0.25rem);
+      inset-inline-start: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      min-width: 17rem;
+      max-width: calc(100vw - 2rem);
+      padding: 0.25rem;
+      border: 1px solid var(--sl-color-hairline);
+      border-radius: 0.375rem;
+      background-color: var(--sl-color-bg-nav);
+      box-shadow: var(--sl-shadow-md);
+    }
+    .pa-md-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.625rem;
+      border: 0;
+      border-radius: 0.25rem;
+      background: none;
+      color: var(--sl-color-gray-2);
+      font-family: inherit;
+      font-size: var(--sl-text-sm);
+      text-align: start;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .pa-md-item:is(:hover, :focus-visible) {
+      background-color: var(--sl-color-bg);
+      color: var(--sl-color-accent-high);
+    }
+    .pa-md-item svg {
+      width: 1rem;
+      height: 1rem;
+      flex: none;
+    }
+
+    /* ChatGPT/Claude 锁标（lobe DOM 同构）：图标 + 品牌名 span，字号比例取自 lobe
+       （文字 = 图标×0.75×0.95、w600、line-height 1）；图标-文字间距 0.375rem
+       （lobe 原比 0.1×size≈1.8px 太紧，2026-10-08 用户反馈不能紧挨） */
+    .pa-combine {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .pa-combine-text {
+      font-size: 0.8rem;
+      line-height: 1;
+      font-weight: 600;
+    }
+
+    /* AI 按钮头像（lobe IconAvatar 规格）：品牌底色容器 + 图标 scale；
+       圆=50%、方=0.125rem（方形方案注释存档） */
+    .pa-ai-icons {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.125rem;
+    }
+    .pa-av {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.375rem;
+      height: 1.375rem;
+      overflow: hidden;
+      flex: none;
+    }
+    .pa-ai-round .pa-av {
+      border-radius: 50%;
+    }
+    .pa-ai-square .pa-av {
+      border-radius: 0.125rem;
+    }
+    .pa-av-ring-light {
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+    }
+    .pa-av-ring-dark {
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    }
+    .pa-av svg.pa-av-svg,
+    .pa-av img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* AiIcon（pa-icon-*）输出对位 v5 形态：combine 锁标图标=v5 svg.pa-combine-ic 的
+       1.125rem；头像圆钮（direct round/square）图标/位图=v5 .pa-av 同规格（圆角+inset ring）。
+       窄屏 .pa-btn svg 不得压过这两条（本组选择器特异性更高） */
+    .pa-combine .pa-icon-svg {
+      width: 1.125rem;
+      height: 1.125rem;
+      flex: none;
+    }
+    .pa-ai > .pa-icon-svg {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+    .pa-icon-img {
+      display: block;
+      border-radius: 50%;
+    }
+    .pa-icon-img[data-ring='light'] {
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+    }
+    .pa-icon-img[data-ring='dark'] {
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    }
+
+    /* 窄屏：文字标签隐藏（aria-label 兜底），图标稍放大保可点性。 */
+    @media (max-width: 40rem) {
+      .pa-label {
+        display: none;
+      }
+      .pa-btn {
+        padding: 0.375rem;
+      }
+      .pa-btn svg,
+      .pa-md-item svg {
+        width: 1.125rem;
+        height: 1.125rem;
+      }
+    }
+  }
+</style>

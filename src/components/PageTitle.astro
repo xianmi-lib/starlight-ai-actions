@@ -1,5 +1,23 @@
 ---
 import Default from '@astrojs/starlight/components/PageTitle.astro';
+import AiActionsBar from './AiActionsBar.astro';
+import options from 'virtual:starlight-ai-actions/options';
+import { mergeLabels } from '../labels.js';
+import { renderMdUrl, renderPrompt, resolveShow } from '../config.js';
+const { entry, lang } = (Astro.locals as any).starlightRoute;
+const fm = entry.data.aiActions;
+const show = fm !== false && resolveShow(entry, options.where ?? {});
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const site = Astro.site ? String(Astro.site).replace(/\/$/, '') : '';
+const mdUrlTpl = options.markdown === false ? '' : (options.markdown.mdUrl ?? '');
+const mdHref = mdUrlTpl ? renderMdUrl(mdUrlTpl, { base, filePath: (entry.filePath ?? '').replace(/^src\/content\/docs\//, ''), site }) : '';
+const prompt = renderPrompt(options.prompt ?? '', { url: mdHref, title: entry.data.title ?? '', lang: lang ?? 'en', site });
+const labels = mergeLabels(lang ?? 'en', options.labels);
+const dialogTitle = options.dialog === false ? '' : (options.dialog?.title ?? labels.dialogTitle);
 ---
 <Default {...Astro.props}><slot /></Default>
-<!-- ai-actions-shell -->
+{show && <AiActionsBar
+  mdHref={mdHref} mdUrl={mdHref} prompt={prompt} labels={labels}
+  markdownItems={options.markdown === false ? [] : (options.markdown.items ?? [])}
+  direct={options.direct ?? false} paste={options.paste ?? false} dialogTitle={dialogTitle}
+/>}
