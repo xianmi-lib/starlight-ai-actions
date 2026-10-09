@@ -15,7 +15,10 @@ const { mdHref, mdUrl, prompt, labels, markdownItems, direct, paste, dialogTitle
 const enc = encodeURIComponent(prompt);
 const renderHref = (tpl: string) => tpl.replaceAll('{prompt}', enc).replaceAll('{url}', encodeURIComponent(mdUrl));
 const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent: labels.copyContent, copyUrl: labels.copyUrl, copyPrompt: labels.copyPrompt };
+// spec §8：direct/paste 空数组或 false 视同关组；三组全关 → 整条按钮行不渲染（sr-only 播报区随之不渲染）
+const hasAnyGroup = markdownItems.length > 0 || (direct !== false && direct.length > 0) || (paste !== false && paste.length > 0);
 ---
+{hasAnyGroup && (
 <div class="page-actions-bar print:hidden" data-copy-success={labels.copySuccess} data-copy-fail={labels.copyFail}>
   {markdownItems.length > 0 && (
     <details class="pa-md" data-md-href={mdHref} data-md-url={mdUrl} data-prompt={prompt}>
@@ -65,6 +68,7 @@ const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent
   {/* 屏幕阅读器播报区（v5 同款，Task 9 脚本 root.querySelector('.pa-live') 依赖） */}
   <span class="sr-only pa-live" aria-live="polite" aria-atomic="true"></span>
 </div>
+)}
 
 <style>
   @layer starlight.core {

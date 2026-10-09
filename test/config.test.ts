@@ -44,3 +44,15 @@ describe('validateOptions', () => {
     expect(() => validateOptions({ markdown: false, direct: false, paste: false, dialog: false })).not.toThrow();
   });
 });
+describe('validateOptions 边界', () => {
+  it('markdown:false 且 prompt 无 {url} 时不需要 mdUrl', () => {
+    expect(() => validateOptions({ markdown: false, prompt: '读 {title}', direct: false, paste: false, dialog: false })).not.toThrow();
+  });
+  it('direct href 含 {url} 时需要 mdUrl', () => {
+    expect(() => validateOptions({ markdown: false, direct: [{ name: 'X', href: 'https://x.test/?u={url}', icon: 'gemini' }], paste: false, dialog: false })).toThrowError(/mdUrl/);
+  });
+  it('空数组视同关组', () => {
+    const o = validateOptions({ markdown: { mdUrl: '/md/{filePath}', items: [] }, direct: false, paste: false, dialog: false });
+    expect(o.markdown === false ? undefined : o.markdown?.items).toEqual([]);
+  });
+});
