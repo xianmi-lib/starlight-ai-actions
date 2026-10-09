@@ -3,6 +3,7 @@ import AiIcon from './AiIcon.astro';
 import spriteUrl from '../assets/icons.svg?url';
 import doubaoUrl from '../assets/doubao.png?url';
 import type { DirectProvider, PasteProvider, Labels, MarkdownItem } from '../types.js';
+import { resolveName } from '../config.js';
 interface Props {
   mdHref: string; mdUrl: string; prompt: string;
   labels: Labels;
@@ -10,8 +11,9 @@ interface Props {
   direct: DirectProvider[] | false;
   paste: PasteProvider[] | false;
   dialogTitle: string;
+  lang: string;
 }
-const { mdHref, mdUrl, prompt, labels, markdownItems, direct, paste, dialogTitle } = Astro.props;
+const { mdHref, mdUrl, prompt, labels, markdownItems, direct, paste, dialogTitle, lang } = Astro.props;
 const enc = encodeURIComponent(prompt);
 const renderHref = (tpl: string) => tpl.replaceAll('{prompt}', enc).replaceAll('{url}', encodeURIComponent(mdUrl));
 const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent: labels.copyContent, copyUrl: labels.copyUrl, copyPrompt: labels.copyPrompt };
@@ -44,12 +46,12 @@ const hasAnyGroup = markdownItems.length > 0 || (direct !== false && direct.leng
   )}
   {direct && direct.map((p) => (
     p.style === 'combine' ? (
-      <a class="pa-btn pa-combine" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name} aria-label={p.name}>
+      <a class="pa-btn pa-combine" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={resolveName(p.name, lang)} aria-label={resolveName(p.name, lang)}>
         {/* scale=1 + bg=transparent：锁标裸标 20px（抵消 AiIcon 默认 0.75 缩放与 #fff 白底，v5 形态） */}
-        <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} scale={1} bg="transparent" /><span class="pa-combine-text">{p.name}</span>
+        <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} scale={1} bg="transparent" /><span class="pa-combine-text">{resolveName(p.name, lang)}</span>
       </a>
     ) : (
-      <a class="pa-btn pa-ai pa-ai-round" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name} aria-label={p.name}>
+      <a class="pa-btn pa-ai pa-ai-round" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={resolveName(p.name, lang)} aria-label={resolveName(p.name, lang)}>
         <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={40} bg={p.bg} scale={p.scale} ring={p.ring} />
       </a>
     )

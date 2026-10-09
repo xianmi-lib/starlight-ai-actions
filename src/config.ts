@@ -1,4 +1,4 @@
-import type { EntryLike, StarlightAiActionsOptions, DirectProvider, PasteProvider } from './types.js';
+import type { EntryLike, StarlightAiActionsOptions, DirectProvider, PasteProvider, ProviderName } from './types.js';
 
 export const DEFAULT_ITEMS = ['view', 'copyContent', 'copyUrl', 'copyPrompt'] as const;
 export const DEFAULT_DIRECT: DirectProvider[] = [
@@ -9,9 +9,9 @@ export const DEFAULT_PASTE: PasteProvider[] = [
   { name: 'Gemini', href: 'https://gemini.google.com/app', icon: 'gemini', bg: '#fff', scale: 0.8, ring: 'light' },
   { name: 'Copilot', href: 'https://copilot.microsoft.com/', icon: 'copilot', bg: '#fff', scale: 0.75, ring: 'light' },
   { name: 'Poe', href: 'https://poe.com/', icon: 'poe', bg: '#fff', scale: 0.75, ring: 'light' },
-  { name: '豆包', href: 'https://www.doubao.com/chat/', icon: 'doubao', bg: '#fff', scale: 0.75, ring: 'light' },
-  { name: '千问', href: 'https://www.qianwen.com/chat/', icon: 'qwen', bg: '#fff', scale: 0.75, ring: 'light' },
-  { name: '元宝', href: 'https://yuanbao.tencent.com/', icon: 'yuanbao', bg: '#fff', scale: 0.75, ring: 'light' },
+  { name: { en: 'Doubao', 'zh-CN': '豆包', 'zh-TW': '豆包' }, href: 'https://www.doubao.com/chat/', icon: 'doubao', bg: '#fff', scale: 0.75, ring: 'light' },
+  { name: { en: 'Qwen', 'zh-CN': '千问', 'zh-TW': '千問' }, href: 'https://www.qianwen.com/chat/', icon: 'qwen', bg: '#fff', scale: 0.75, ring: 'light' },
+  { name: { en: 'Yuanbao', 'zh-CN': '元宝', 'zh-TW': '元寶' }, href: 'https://yuanbao.tencent.com/', icon: 'yuanbao', bg: '#fff', scale: 0.75, ring: 'light' },
 ];
 // 缺省 prompt 按页面语言三语（通用措辞，不含站点名）；用户可用 `prompt` 全局覆盖
 export const DEFAULT_PROMPTS: Record<'en' | 'zh-CN' | 'zh-TW', string> = {
@@ -25,6 +25,12 @@ export function resolvePrompt(fmPrompt: string | undefined, optionPrompt: string
   if (fmPrompt) return fmPrompt;
   if (optionPrompt) return optionPrompt;
   return DEFAULT_PROMPTS[lang as keyof typeof DEFAULT_PROMPTS] ?? DEFAULT_PROMPTS.en;
+}
+
+// 显示名按语言解析：字符串原样返回；映射=精确 lang → 语言基码（zh-TW→zh）→ en → 首个可用值
+export function resolveName(name: ProviderName, lang: string): string {
+  if (typeof name === 'string') return name;
+  return name[lang] ?? name[lang.split('-')[0]] ?? name.en ?? Object.values(name)[0] ?? '';
 }
 
 export function renderPrompt(template: string, ctx: { url: string; title: string; lang: string; site: string }): string {

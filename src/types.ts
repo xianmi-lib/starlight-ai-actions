@@ -7,8 +7,11 @@ export interface EntryLike {
   data: { title?: string; aiActions?: false | { prompt?: string } };
 }
 
+/** 显示名：字符串=全语言同名；映射键=语言码（en/zh-CN/zh-TW 等任意子集），解析序见 resolveName */
+export type ProviderName = string | Record<string, string>;
+
 export interface ProviderBase {
-  name: string;
+  name: ProviderName;
   href: string;
   icon: string;
   iconUrl?: string;

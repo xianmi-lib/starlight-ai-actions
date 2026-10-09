@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_PROMPTS, renderPrompt, renderMdUrl, resolvePrompt, resolveShow, validateOptions } from '../src/config.js';
+import { DEFAULT_PASTE, DEFAULT_PROMPTS, renderPrompt, renderMdUrl, resolveName, resolvePrompt, resolveShow, validateOptions } from '../src/config.js';
 
 describe('renderPrompt', () => {
   it('替换全部占位符', () => {
@@ -102,5 +102,43 @@ describe('DEFAULT_PROMPTS / resolvePrompt', () => {
   it('validateOptions 不再代填 prompt（缺省留给 resolvePrompt 按语言取）', () => {
     const o = validateOptions({ markdown: { mdUrl: '/md/{filePath}' } });
     expect(o.prompt).toBeUndefined();
+  });
+});
+describe('resolveName', () => {
+  it('字符串形态原样返回（全语言同名）', () => {
+    expect(resolveName('ChatGPT', 'en')).toBe('ChatGPT');
+    expect(resolveName('ChatGPT', 'zh-TW')).toBe('ChatGPT');
+    expect(resolveName('ChatGPT', '')).toBe('ChatGPT');
+  });
+  it('映射形态精确 lang 命中', () => {
+    const n = { en: 'Doubao', 'zh-CN': '豆包', 'zh-TW': '豆包' };
+    expect(resolveName(n, 'en')).toBe('Doubao');
+    expect(resolveName(n, 'zh-CN')).toBe('豆包');
+    expect(resolveName(n, 'zh-TW')).toBe('豆包');
+  });
+  it('精确不中时语言基码回退（zh-TW → zh）', () => {
+    expect(resolveName({ zh: '千問', en: 'Qwen' }, 'zh-TW')).toBe('千問');
+    expect(resolveName({ zh: '千問', en: 'Qwen' }, 'zh-CN')).toBe('千問');
+    expect(resolveName({ zh: '千問', en: 'Qwen' }, 'fr')).toBe('Qwen');
+  });
+  it('缺 en 回退首个可用值', () => {
+    expect(resolveName({ 'zh-CN': '元宝', 'zh-TW': '元寶' }, 'en')).toBe('元宝');
+    expect(resolveName({ 'zh-CN': '元宝', 'zh-TW': '元寶' }, 'ja')).toBe('元宝');
+    expect(resolveName({ de: 'Bot' }, 'en')).toBe('Bot');
+  });
+});
+describe('DEFAULT_PASTE 中文品牌 name 按语言映射', () => {
+  it('豆包/千问/元宝三语齐全，其余品牌为字符串', () => {
+    const byIcon = Object.fromEntries(DEFAULT_PASTE.map((p) => [p.icon, p.name]));
+    expect(byIcon.doubao).toEqual({ en: 'Doubao', 'zh-CN': '豆包', 'zh-TW': '豆包' });
+    expect(byIcon.qwen).toEqual({ en: 'Qwen', 'zh-CN': '千问', 'zh-TW': '千問' });
+    expect(byIcon.yuanbao).toEqual({ en: 'Yuanbao', 'zh-CN': '元宝', 'zh-TW': '元寶' });
+    for (const icon of ['gemini', 'copilot', 'poe']) expect(typeof byIcon[icon]).toBe('string');
+  });
+  it('解析后 en 页面显示英文品牌名', () => {
+    for (const p of DEFAULT_PASTE) {
+      const n = resolveName(p.name, 'en');
+      expect(n).toMatch(/^[A-Za-z]/);
+    }
   });
 });

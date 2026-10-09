@@ -2,8 +2,9 @@
 import AiIcon from './AiIcon.astro';
 import spriteUrl from '../assets/icons.svg?url';
 import type { PasteProvider, Labels } from '../types.js';
-interface Props { prompt: string; labels: Labels; paste: PasteProvider[]; hint1: string; title: string; }
-const { prompt, labels, paste, hint1, title } = Astro.props;
+import { resolveName } from '../config.js';
+interface Props { prompt: string; labels: Labels; paste: PasteProvider[]; hint1: string; title: string; lang: string; }
+const { prompt, labels, paste, hint1, title, lang } = Astro.props;
 ---
 <dialog class="pa-ai-dialog" aria-label={title}>
   <div class="pa-ai-dialog-inner">
@@ -16,8 +17,8 @@ const { prompt, labels, paste, hint1, title } = Astro.props;
     <p class="pa-ai-guide">{hint1}</p>
     <div class="pa-ai-models">
       {paste.map((p) => (
-        <a class="pa-btn pa-ai-model" href={p.href} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name}>
-          <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} bg={p.bg} scale={p.scale} ring={p.ring} /><span>{p.name}</span>
+        <a class="pa-btn pa-ai-model" href={p.href} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={resolveName(p.name, lang)}>
+          <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} bg={p.bg} scale={p.scale} ring={p.ring} /><span>{resolveName(p.name, lang)}</span>
         </a>
       ))}
     </div>
