@@ -22,7 +22,7 @@ const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent
       <summary class="pa-btn">{labels.mdMenu}</summary>
       <div class="pa-md-menu">
         {markdownItems.map((item) => item === 'view' ? (
-          <a class="pa-md-item" href={mdHref} data-ai-action="view" data-action-url={mdHref}>{labels.view}</a>
+          <a class="pa-md-item" href={mdHref} target="_blank" rel="noopener noreferrer" data-ai-action="view" data-action-url={mdHref}>{labels.view}</a>
         ) : (
           <button type="button" class="pa-md-item" data-copy={item} data-ai-action={item}>{itemLabel[item]}</button>
         ))}
@@ -31,11 +31,11 @@ const itemLabel: Record<MarkdownItem, string> = { view: labels.view, copyContent
   )}
   {direct && direct.map((p) => (
     p.style === 'combine' ? (
-      <a class="pa-btn pa-combine" href={renderHref(p.href)} data-ai-action="open" data-provider={p.name} aria-label={p.name}>
+      <a class="pa-btn pa-combine" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name} aria-label={p.name}>
         <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} /><span class="pa-combine-text">{p.name}</span>
       </a>
     ) : (
-      <a class="pa-btn pa-ai pa-ai-round" href={renderHref(p.href)} data-ai-action="open" data-provider={p.name} aria-label={p.name}>
+      <a class="pa-btn pa-ai pa-ai-round" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name} aria-label={p.name}>
         <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={40} bg={p.bg} scale={p.scale} ring={p.ring} />
       </a>
     )
