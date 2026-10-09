@@ -7,7 +7,7 @@ description: Starlight plugin that adds a page-actions bar to your docs — a Ma
 
 - **Markdown tools menu** — view the page's Markdown source, copy its content, copy its URL, or copy a ready-made prompt that references it.
 - **ChatGPT / Claude buttons** — open a new chat with the prompt pre-filled (these two products support prompt prefill via URL).
-- **Discuss with AI** — a paste-prompt dialog with buttons for AI chatbots that have no URL prefill (Gemini, Copilot, Poe, Doubao, Qwen, Yuanbao, or your own list).
+- **Discuss with AI** — a paste-prompt dialog with buttons for AI chatbots that have no URL prefill (Gemini, Copilot, Poe, Doubao, DeepSeek, Qwen, Yuanbao, or your own list).
 
 Everything is configurable from `astro.config.mjs`, can be overridden per page in frontmatter, and speaks English, Simplified Chinese, and Traditional Chinese out of the box (labels follow the page language).
 

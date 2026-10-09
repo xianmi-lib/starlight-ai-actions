@@ -10,6 +10,8 @@ export const DEFAULT_PASTE: PasteProvider[] = [
   { name: 'Copilot', href: 'https://copilot.microsoft.com/', icon: 'copilot', bg: '#fff', scale: 0.75, ring: 'light' },
   { name: 'Poe', href: 'https://poe.com/', icon: 'poe', bg: '#fff', scale: 0.75, ring: 'light' },
   { name: { en: 'Doubao', 'zh-CN': '豆包', 'zh-TW': '豆包' }, href: 'https://www.doubao.com/chat/', icon: 'doubao', bg: '#fff', scale: 0.75, ring: 'light' },
+  // DeepSeek 品牌名三语同形（字符串形态）；预填矩阵（docs/ai-prompt-prefill.md）无 DeepSeek 行=未测 URL 带入，纯跳转勿臆造参数
+  { name: 'DeepSeek', href: 'https://chat.deepseek.com/', icon: 'deepseek', bg: '#fff', scale: 0.75, ring: 'light' },
   { name: { en: 'Qwen', 'zh-CN': '千问', 'zh-TW': '千問' }, href: 'https://www.qianwen.com/chat/', icon: 'qwen', bg: '#fff', scale: 0.75, ring: 'light' },
   { name: { en: 'Yuanbao', 'zh-CN': '元宝', 'zh-TW': '元寶' }, href: 'https://yuanbao.tencent.com/', icon: 'yuanbao', bg: '#fff', scale: 0.75, ring: 'light' },
 ];

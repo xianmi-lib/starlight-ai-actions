@@ -6,7 +6,7 @@
 <div align="center">
 
 [![npm version](https://img.shields.io/npm/v/starlight-ai-actions.svg)](https://www.npmjs.com/package/starlight-ai-actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/xianmi-lib/starlight-ai-actions/blob/main/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-xianmi.co-7c3aed.svg)](https://www.xianmi.co/starlight-ai-actions/)
 
 </div>
@@ -15,7 +15,7 @@
 
 - **Markdown tools menu** — view the page's Markdown source, copy its content, copy its URL, or copy a ready-made prompt that references it
 - **ChatGPT / Claude buttons** — jump straight into a new chat with the prompt pre-filled
-- **Discuss with AI dialog** — paste-prompt workflow with buttons for chatbots that have no URL prefill (Gemini, Copilot, Poe, Doubao, Qwen, Yuanbao, or your own list)
+- **Discuss with AI dialog** — paste-prompt workflow with buttons for chatbots that have no URL prefill (Gemini, Copilot, Poe, Doubao, DeepSeek, Qwen, Yuanbao, or your own list)
 - **Fully configurable** — every button group and every entry can be changed, added, or removed from `astro.config.mjs`, with per-page frontmatter overrides
 - **Multilingual** — English, Simplified Chinese, and Traditional Chinese labels and prompts built in, selected by page language
 - **Zero runtime dependencies** — icons included, `ai-actions` CustomEvent for analytics hooks

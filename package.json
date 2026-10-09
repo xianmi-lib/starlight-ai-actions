@@ -1,6 +1,6 @@
 {
   "name": "starlight-ai-actions",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Starlight page actions: Markdown tools menu and AI-discuss buttons with a paste-prompt dialog.",
   "type": "module",
   "license": "MIT",

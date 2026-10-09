@@ -32,7 +32,7 @@ describe('validateOptions', () => {
     const o = validateOptions({ markdown: { mdUrl: '/md/{filePath}' } });
     expect(o.markdown === false ? undefined : o.markdown?.items).toEqual(['view', 'copyContent', 'copyUrl', 'copyPrompt']);
     expect(o.direct).toHaveLength(2);
-    expect(o.paste).toHaveLength(6);
+    expect(o.paste).toHaveLength(7);
   });
   it('mdUrl 缺失且使用 {url} 时报错', () => {
     expect(() => validateOptions({})).toThrowError(/mdUrl/);
@@ -133,12 +133,26 @@ describe('DEFAULT_PASTE 中文品牌 name 按语言映射', () => {
     expect(byIcon.doubao).toEqual({ en: 'Doubao', 'zh-CN': '豆包', 'zh-TW': '豆包' });
     expect(byIcon.qwen).toEqual({ en: 'Qwen', 'zh-CN': '千问', 'zh-TW': '千問' });
     expect(byIcon.yuanbao).toEqual({ en: 'Yuanbao', 'zh-CN': '元宝', 'zh-TW': '元寶' });
-    for (const icon of ['gemini', 'copilot', 'poe']) expect(typeof byIcon[icon]).toBe('string');
+    for (const icon of ['gemini', 'copilot', 'poe', 'deepseek']) expect(typeof byIcon[icon]).toBe('string');
   });
   it('解析后 en 页面显示英文品牌名', () => {
     for (const p of DEFAULT_PASTE) {
       const n = resolveName(p.name, 'en');
       expect(n).toMatch(/^[A-Za-z]/);
     }
+  });
+});
+describe('DeepSeek 按钮（2026-10-10 用户拍板补入）', () => {
+  it('位于豆包之后、千问之前', () => {
+    const icons = DEFAULT_PASTE.map((p) => p.icon);
+    expect(icons).toEqual(['gemini', 'copilot', 'poe', 'doubao', 'deepseek', 'qwen', 'yuanbao']);
+    expect(icons.indexOf('deepseek')).toBe(icons.indexOf('doubao') + 1);
+    expect(icons.indexOf('deepseek')).toBe(icons.indexOf('qwen') - 1);
+  });
+  it('纯跳转 URL（预填矩阵无 DeepSeek 行=未测带入，勿臆造参数）', () => {
+    const ds = DEFAULT_PASTE.find((p) => p.icon === 'deepseek')!;
+    expect(ds.href).toBe('https://chat.deepseek.com/');
+    expect(ds.href).not.toMatch(/[?{]/);
+    expect(ds.name).toBe('DeepSeek');
   });
 });
