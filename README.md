@@ -11,6 +11,8 @@
 
 </div>
 
+Born from [显密文库 xianmi.co](https://www.xianmi.co/), a large-scale Chinese digital library serving mainly elderly readers of classical Chinese texts.
+
 ## Features
 
 - **Markdown tools menu** — view the page's Markdown source, copy its content, copy its URL, or copy a ready-made prompt that references it

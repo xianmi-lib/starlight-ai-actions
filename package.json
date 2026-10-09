@@ -1,12 +1,16 @@
 {
   "name": "starlight-ai-actions",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Starlight page actions: Markdown tools menu and AI-discuss buttons with a paste-prompt dialog.",
+  "homepage": "https://www.xianmi.co/starlight-ai-actions/",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xianmi-lib/starlight-ai-actions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xianmi-lib/starlight-ai-actions/issues"
   },
   "keywords": [
     "starlight",
