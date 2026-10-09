@@ -30,3 +30,123 @@ const hint1 = options.dialog === false ? '' : (options.dialog?.hint1 ?? labels.d
     )}
   </>
 )}
+
+<script>
+  // 客户端行为（v5 PageTitle 脚本移植）：四项复制 + dialog 开合 + 每次动作派发 ai-actions 事件。
+  // 状态文案读 DOM data 属性（bar root data-copy-success/fail、dialog .pa-ai-status data-ok/fail），零硬编码。
+  import { dispatchAiAction } from '../events.js';
+
+  // 页面上至多一个实例（PageTitle 注入），仍按多实例接线以防将来复用。
+  for (const root of document.querySelectorAll<HTMLElement>('.page-actions-bar')) {
+    const live = root.querySelector<HTMLElement>('.pa-live');
+    const page = () => ({ url: location.href, title: document.title });
+    const copyText = async (text: string): Promise<boolean> => {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // 兜底：非安全上下文/权限拒绝时走 execCommand
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          ta.remove();
+          return ok;
+        } catch {
+          return false;
+        }
+      }
+    };
+
+    // Markdown 合并下拉：外点/Esc 收合 + 三项复制
+    const mdMenu = root.querySelector<HTMLDetailsElement>('details.pa-md');
+    if (mdMenu) {
+      // 「查看 Markdown 文件」是 <a>（无 data-copy），单独接线；派发后照常导航
+      const viewLink = mdMenu.querySelector<HTMLAnchorElement>('a.pa-md-item');
+      viewLink?.addEventListener('click', () => {
+        dispatchAiAction({ type: 'markdown', action: 'view', url: mdMenu.dataset.mdHref, page: page() });
+      });
+      for (const item of mdMenu.querySelectorAll<HTMLButtonElement>('.pa-md-item[data-copy]')) {
+        item.addEventListener('click', async () => {
+          const kind = item.dataset.copy;
+          // data-copy 值域=MarkdownItem 枚举（copyContent/copyUrl/copyPrompt），事件 action 同名
+          const action = kind === 'copyContent' || kind === 'copyUrl' || kind === 'copyPrompt' ? kind : null;
+          if (!action) return;
+          dispatchAiAction({ type: 'markdown', action, url: mdMenu.dataset.mdHref, page: page() });
+          let text = '';
+          if (action === 'copyContent') {
+            try {
+              const res = await fetch(mdMenu.dataset.mdHref!);
+              if (res.ok) text = await res.text();
+            } catch {
+              text = '';
+            }
+          } else if (action === 'copyUrl') {
+            text = mdMenu.dataset.mdUrl ?? '';
+          } else {
+            text = mdMenu.dataset.prompt ?? '';
+          }
+          const ok = Boolean(text) && (await copyText(text));
+          const okText = root.dataset.copySuccess ?? '';
+          const failText = root.dataset.copyFail ?? '';
+          const label = item.querySelector<HTMLElement>('span') ?? item;
+          const orig = label.textContent ?? '';
+          label.textContent = ok ? okText : failText;
+          if (live) live.textContent = ok ? okText : failText;
+          setTimeout(() => {
+            label.textContent = orig;
+            if (live) live.textContent = '';
+          }, 1600);
+        });
+      }
+      document.addEventListener('click', (e) => {
+        if (mdMenu.open && !mdMenu.contains(e.target as Node)) mdMenu.open = false;
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mdMenu.open) mdMenu.open = false;
+      });
+    }
+
+    // direct 直跳按钮（<a>）：派发后照常导航，不 preventDefault
+    for (const btn of root.querySelectorAll<HTMLAnchorElement>('a[data-ai-action="open"]')) {
+      btn.addEventListener('click', () => {
+        dispatchAiAction({ type: 'direct', action: 'open', provider: btn.dataset.provider, page: page() });
+      });
+    }
+
+    // AI 按钮：prompt 全文 → 剪贴板 + 弹 dialog
+    const dialog = root.parentElement?.querySelector<HTMLDialogElement>('dialog.pa-ai-dialog');
+    if (dialog) {
+      const status = dialog.querySelector<HTMLElement>('.pa-ai-status');
+      for (const aiBtn of root.querySelectorAll<HTMLButtonElement>('button.pa-ai')) {
+        aiBtn.addEventListener('click', async () => {
+          dispatchAiAction({ type: 'paste', action: 'open', page: page() });
+          // 先开 modal（反馈即时）再复制写状态；防重复 showModal 抛 InvalidStateError
+          if (!dialog.open) dialog.showModal();
+          const ok = await copyText(aiBtn.dataset.prompt ?? '');
+          if (status) {
+            status.textContent = ok ? status.dataset.ok! : status.dataset.fail!;
+          }
+        });
+      }
+      // dialog 内模型钮：派发后照常导航，不 preventDefault
+      for (const model of dialog.querySelectorAll<HTMLAnchorElement>('a[data-ai-action="open"]')) {
+        model.addEventListener('click', () => {
+          dispatchAiAction({ type: 'paste', action: 'open', provider: model.dataset.provider, page: page() });
+        });
+      }
+      // 点遮罩关闭（Esc 原生支持）：判断点击坐标在 dialog 矩形外即视为遮罩
+      dialog.addEventListener('click', (e) => {
+        const r = dialog.getBoundingClientRect();
+        const inDialog =
+          e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        if (!inDialog) dialog.close();
+      });
+      dialog.querySelector<HTMLButtonElement>('.pa-ai-close')?.addEventListener('click', () => dialog.close());
+    }
+  }
+</script>
