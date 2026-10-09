@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 const base = process.env.BASE ?? 'http://127.0.0.1:4341';
-const paths = (process.env.PATHS ?? '/a/,/').split(',');
+const paths = (process.env.PATHS ?? '/starlight-ai-actions/a/,/starlight-ai-actions/').split(',');
 const widths = [320, 390, 640, 768, 1400];
 const browser = await chromium.launch();
 let bad = 0;

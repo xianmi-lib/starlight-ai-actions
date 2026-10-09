@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const base = 'http://127.0.0.1:4341';
+const base = 'http://127.0.0.1:4341/starlight-ai-actions';
 const browser = await chromium.launch();
 const page = await browser.newPage();
 const events = [];

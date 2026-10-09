@@ -1,0 +1,15 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "starlight-ai-actions",
+	"compatibility_date": "2026-10-09",
+	"assets": {
+		"directory": "./dist"
+	},
+	// 生产路由：星号形态覆盖 /starlight-ai-actions 与 /starlight-ai-actions/*；
+	// 「更具体者优先」必须压过 theme worker 的 www.xianmi.co/starlight*（长前缀赢）
+	"routes": [
+		{ "pattern": "www.xianmi.co/starlight-ai-actions*", "zone_name": "xianmi.co" },
+		{ "pattern": "xianmi.co/starlight-ai-actions*", "zone_name": "xianmi.co" }
+	],
+	"workers_dev": true
+}

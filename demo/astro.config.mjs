@@ -5,7 +5,10 @@ import starlightThemeLargePrint from 'starlight-theme-large-print';
 import starlightAiActions from 'starlight-ai-actions';
 
 export default defineConfig({
-  site: 'https://example.com',
+  site: 'https://www.xianmi.co',
+  // 文档站挂 www.xianmi.co/starlight-ai-actions*（theme demo 的 /starlight 同模式）：
+  // base 只改 URL 前缀，dev 下 URL 同样带前缀
+  base: '/starlight-ai-actions',
   vite: {
     server: {
       fs: {
@@ -27,31 +30,27 @@ export default defineConfig({
         starlightThemeLargePrint({ font: 'noto-serif-sc' }),
         // sidebar-topics 工厂禁止顶层 sidebar 配置（会 throw）：原 sidebar 条目收进 topics。
         // items 用 link 型（非 slug 型）：slug 型会按当前 locale 重解析、缺镜像页直接 throw；
-        // link 型只按 locale 加前缀不查内容库。页归属走各页 frontmatter `topic`
-        starlightSidebarTopics([
-          {
-            label: 'Demo',
-            id: 'demo',
-            icon: 'open-book',
-            link: '/a/',
-            items: [
-              { label: 'A', link: '/a/' },
-              { label: 'Hidden', link: '/hidden/' },
-              { label: 'Custom prompt', link: '/custom-prompt/' },
-            ],
-          },
-          {
-            label: 'Pages',
-            id: 'pages',
-            icon: 'document',
-            link: '/',
-            items: [
-              { label: 'Home', link: '/' },
-              { label: 'Index page', link: '/index-page/' },
-              { label: 'Guides', link: '/guides/' },
-            ],
-          },
-        ]),
+        // link 型只按 locale 加前缀不查内容库。页归属走各页 frontmatter `topic` 不动：
+        // `topic: demo` 命中 id；`topic: pages` 与无 topic 的落地页（教程页）经 options.topics
+        // 全模式映射回 Guide（根 index 的 slug 匹配不到 topic.link '/'，落地页必须走映射）
+        starlightSidebarTopics(
+          [
+            {
+              label: 'Guide',
+              id: 'demo',
+              icon: 'open-book',
+              link: '/',
+              items: [
+                { label: 'A', link: '/a/' },
+                { label: 'Hidden', link: '/hidden/' },
+                { label: 'Custom prompt', link: '/custom-prompt/' },
+                { label: 'Index page', link: '/index-page/' },
+                { label: 'Guides', link: '/guides/' },
+              ],
+            },
+          ],
+          { topics: { demo: ['**'] } },
+        ),
         starlightAiActions({
           // {base}/md/{filePath} 同源相对路径：demo 在 public/md/ 提供 raw markdown 真源
           markdown: { items: ['view', 'copyContent', 'copyUrl', 'copyPrompt'], mdUrl: '{base}/md/{filePath}' },
