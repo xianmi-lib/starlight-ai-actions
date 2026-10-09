@@ -1,6 +1,7 @@
 ---
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import AiActionsBar from './AiActionsBar.astro';
+import AiDialog from './AiDialog.astro';
 import options from 'virtual:starlight-ai-actions/options';
 import { mergeLabels } from '../labels.js';
 import { renderMdUrl, renderPrompt, resolveShow } from '../config.js';
@@ -14,10 +15,18 @@ const mdHref = mdUrlTpl ? renderMdUrl(mdUrlTpl, { base, filePath: (entry.filePat
 const prompt = renderPrompt(options.prompt ?? '', { url: mdHref, title: entry.data.title ?? '', lang: lang ?? 'en', site });
 const labels = mergeLabels(lang ?? 'en', options.labels);
 const dialogTitle = options.dialog === false ? '' : (options.dialog?.title ?? labels.dialogTitle);
+const hint1 = options.dialog === false ? '' : (options.dialog?.hint1 ?? labels.dialogHint1);
 ---
 <Default {...Astro.props}><slot /></Default>
-{show && <AiActionsBar
-  mdHref={mdHref} mdUrl={mdHref} prompt={prompt} labels={labels}
-  markdownItems={options.markdown === false ? [] : (options.markdown.items ?? [])}
-  direct={options.direct ?? false} paste={options.paste ?? false} dialogTitle={dialogTitle}
-/>}
+{show && (
+  <>
+    <AiActionsBar
+      mdHref={mdHref} mdUrl={mdHref} prompt={prompt} labels={labels}
+      markdownItems={options.markdown === false ? [] : (options.markdown.items ?? [])}
+      direct={options.direct ?? false} paste={options.paste ?? false} dialogTitle={dialogTitle}
+    />
+    {options.paste && options.paste.length > 0 && (
+      <AiDialog prompt={prompt} labels={labels} paste={options.paste ?? []} hint1={hint1} title={dialogTitle} />
+    )}
+  </>
+)}

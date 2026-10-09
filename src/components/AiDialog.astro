@@ -1,0 +1,130 @@
+---
+import AiIcon from './AiIcon.astro';
+import type { PasteProvider, Labels } from '../types.js';
+interface Props { prompt: string; labels: Labels; paste: PasteProvider[]; hint1: string; title: string; }
+const { prompt, labels, paste, hint1, title } = Astro.props;
+---
+<dialog class="pa-ai-dialog" aria-label={title}>
+  <div class="pa-ai-dialog-inner">
+    <div class="pa-ai-prompt">{prompt}</div>
+    <div class="pa-live" aria-live="polite"></div>
+    <p class="pa-ai-hint">{hint1}</p>
+    <div class="pa-ai-models">
+      {paste.map((p) => (
+        <a class="pa-btn pa-ai-model" href={p.href} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name}>
+          <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} bg={p.bg} scale={p.scale} ring={p.ring} /><span>{p.name}</span>
+        </a>
+      ))}
+    </div>
+    <button type="button" class="pa-ai-close" aria-label={labels.dialogClose}>×</button>
+  </div>
+</dialog>
+
+<style>
+  @layer starlight.core {
+    /* 「和 AI 讨论」modal：原生 <dialog>，Esc/遮罩关闭 */
+    .pa-ai-dialog {
+      /* Starlight reset 清掉了 UA 的 margin:auto——不补则 modal 顶在左上角 */
+      margin: auto;
+      width: min(34rem, calc(100vw - 2rem));
+      max-height: calc(100vh - 3rem);
+      overflow: auto;
+      padding: 1rem 1.25rem 1.125rem;
+      border: 1px solid var(--sl-color-hairline);
+      border-radius: 0.5rem;
+      background-color: var(--sl-color-bg);
+      color: var(--sl-color-text);
+      box-shadow: var(--sl-shadow-lg);
+    }
+    .pa-ai-dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.45);
+    }
+    .pa-ai-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem;
+      border: 0;
+      border-radius: 0.375rem;
+      background: none;
+      color: var(--sl-color-gray-2);
+      cursor: pointer;
+    }
+    .pa-ai-close:is(:hover, :focus-visible) {
+      color: var(--sl-color-accent-high);
+    }
+    .pa-ai-close svg {
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+    .pa-ai-prompt {
+      max-height: 10rem;
+      overflow: auto;
+      padding: 0.625rem 0.75rem;
+      border: 1px solid var(--sl-color-hairline);
+      border-radius: 0.375rem;
+      background-color: var(--sl-color-bg-nav);
+      font-size: var(--sl-text-sm);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .pa-live {
+      min-height: 1.5rem;
+      margin: 0.5rem 0 0.25rem;
+      color: var(--sl-color-gray-2);
+      font-size: var(--sl-text-sm);
+    }
+    .pa-ai-hint {
+      margin: 0 0 0.5rem;
+      color: var(--sl-color-gray-2);
+      font-size: var(--sl-text-sm);
+      line-height: 1.7;
+    }
+    .pa-ai-models {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+    }
+    .pa-ai-model {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.125rem 0.5rem;
+      border: 1px solid var(--sl-color-hairline);
+      border-radius: 999px;
+      color: var(--sl-color-text);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .pa-ai-model:is(:hover, :focus-visible) {
+      border-color: var(--sl-color-accent);
+      color: var(--sl-color-accent-high);
+    }
+    /* v5 `.pa-ai-model .pa-ai-ic`（1.125rem）+ `img.pa-ai-ic`（radius 0.1875rem）对位到
+       AiIcon 输出类。AiIcon 是独立组件，Astro scoped 选择器够不到它的根元素
+       （实测根元素不带父组件 scope class），故 :global 只在 .pa-ai-model 内放行 */
+    .pa-ai-model :global(.pa-icon-svg),
+    .pa-ai-model :global(.pa-icon-img) {
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+    .pa-ai-model :global(img.pa-icon-img) {
+      border-radius: 0.1875rem;
+    }
+
+    /* 窄屏 */
+    @media (max-width: 40rem) {
+      .pa-ai-close svg {
+        width: 1.125rem;
+        height: 1.125rem;
+      }
+      .pa-ai-dialog {
+        width: calc(100vw - 1.5rem);
+        padding: 0.875rem 0.875rem 1rem;
+      }
+    }
+  }
+</style>
