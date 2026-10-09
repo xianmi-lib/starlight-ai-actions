@@ -1,5 +1,6 @@
 ---
 import AiIcon from './AiIcon.astro';
+import spriteUrl from '../assets/icons.svg?url';
 import type { PasteProvider, Labels } from '../types.js';
 interface Props { prompt: string; labels: Labels; paste: PasteProvider[]; hint1: string; title: string; }
 const { prompt, labels, paste, hint1, title } = Astro.props;
@@ -8,7 +9,7 @@ const { prompt, labels, paste, hint1, title } = Astro.props;
   <div class="pa-ai-dialog-inner">
     <div class="pa-ai-head">
       <strong class="pa-ai-title">{title}</strong>
-      <button type="button" class="pa-ai-close" aria-label={labels.dialogClose}>×</button>
+      <button type="button" class="pa-ai-close" aria-label={labels.dialogClose}><svg aria-hidden="true"><use href={`${spriteUrl}#ic-close`}></use></svg></button>
     </div>
     <div class="pa-ai-prompt">{prompt}</div>
     <p class="pa-ai-status" data-status data-ok={labels.copySuccess} data-fail={labels.copyFail} aria-live="polite"></p>
