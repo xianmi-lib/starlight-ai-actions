@@ -35,7 +35,8 @@ const hasAnyGroup = markdownItems.length > 0 || (direct !== false && direct.leng
   {direct && direct.map((p) => (
     p.style === 'combine' ? (
       <a class="pa-btn pa-combine" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name} aria-label={p.name}>
-        <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} /><span class="pa-combine-text">{p.name}</span>
+        {/* scale=1 + bg=transparent：锁标裸标 20px（抵消 AiIcon 默认 0.75 缩放与 #fff 白底，v5 形态） */}
+        <AiIcon icon={p.icon} iconUrl={p.iconUrl} size={20} scale={1} bg="transparent" /><span class="pa-combine-text">{p.name}</span>
       </a>
     ) : (
       <a class="pa-btn pa-ai pa-ai-round" href={renderHref(p.href)} target="_blank" rel="noopener noreferrer" data-ai-action="open" data-provider={p.name} aria-label={p.name}>
@@ -208,25 +209,34 @@ const hasAnyGroup = markdownItems.length > 0 || (direct !== false && direct.leng
     }
 
     /* AiIcon（pa-icon-*）输出对位 v5 形态：combine 锁标图标=v5 svg.pa-combine-ic 的
-       1.125rem；头像圆钮（direct round/square）图标/位图=v5 .pa-av 同规格（圆角+inset ring）。
-       窄屏 .pa-btn svg 不得压过这两条（本组选择器特异性更高） */
-    .pa-combine .pa-icon-svg {
+       1.125rem（位图=v5 img.pa-ai-ic 裸标形态：20px、radius 0.1875rem、无白底无 ring）；
+       头像圆钮（direct round/square）图标/位图=v5 .pa-av 同规格（圆角+inset ring）。
+       AiIcon 是独立子组件，其根元素不带本组件 scope 属性（同 AiDialog 实测），
+       scoped 选择器够不到——:global() 只在 .pa-combine / .pa-ai 语境内放行 */
+    .pa-combine :global(.pa-icon-svg) {
       width: 1.125rem;
       height: 1.125rem;
       flex: none;
     }
-    .pa-ai > .pa-icon-svg {
+    .pa-combine :global(img.pa-icon-img) {
+      width: 1.25rem;
+      height: 1.25rem;
+      flex: none;
+      border-radius: 0.1875rem;
+      box-shadow: none;
+    }
+    .pa-ai > :global(.pa-icon-svg) {
       width: 2.5rem;
       height: 2.5rem;
     }
-    .pa-icon-img {
+    .pa-ai :global(img.pa-icon-img) {
       display: block;
       border-radius: 50%;
     }
-    .pa-icon-img[data-ring='light'] {
+    .pa-ai :global(img.pa-icon-img[data-ring='light']) {
       box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
     }
-    .pa-icon-img[data-ring='dark'] {
+    .pa-ai :global(img.pa-icon-img[data-ring='dark']) {
       box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
     }
 
