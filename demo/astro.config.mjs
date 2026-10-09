@@ -9,15 +9,6 @@ export default defineConfig({
   // 文档站挂 www.xianmi.co/starlight-ai-actions*（theme demo 的 /starlight 同模式）：
   // base 只改 URL 前缀，dev 下 URL 同样带前缀
   base: '/starlight-ai-actions',
-  vite: {
-    server: {
-      fs: {
-        // starlight-theme-large-print 是 file: 链接的外部仓库（../../starlight-theme-large-print），
-        // dev 下 Vite 只服务项目根内文件，需放行公共父目录（照 xianmi-preview-cn 挂接现状）
-        allow: ['../..'],
-      },
-    },
-  },
   integrations: [
     starlight({
       title: 'Starlight AI Actions',
