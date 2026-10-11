@@ -28,5 +28,6 @@
 ## 已踩过的坑（部署/依赖）
 
 - **file: 兄弟仓依赖会炸 CF Builds**（2026-10-09 两次构建失败实证）：demo 曾以 `file:../../starlight-theme-large-print/...` 引用兄弟仓（共存验证），云端 checkout 无仓外路径，config 加载即 `Cannot find module`；即便仓内 `file:..`（本插件自身）也有坑——npm 装成符号链接后，插件内 `import '@astrojs/starlight/…'` 从**真实路径**（仓库根）向上解析、云端根目录无 node_modules 而失败。**定稿：demo 依赖一律 registry 形态**（`starlight-ai-actions@^0.1.0` + theme/font `^0.4.2`），与真实用户安装形态一致，两类问题同时根治。本地迭代插件源码时 demo 不会热更（registry 快照），临时改 `file:..` 验完记得改回。
+- **插件版本 bump 必须同步重生成 demo lockfile**（2026-10-12 CF Builds 失败实证）：0.2.0 bump 时只改了 demo/package.json（`^0.1.0`→`^0.2.0`），demo/package-lock.json 仍锁 0.1.0，云端 `npm ci` 硬校验「lock 不满足 package.json」直接挂构建，本地 `npm install`/`npm run dev` 却能跑——**本地不报错≠云端能过**，bump 后必须重生成 lockfile 并以「云端 Builds success」为收口。
 - **npm file: 依赖惰性保留**：`file:..` 链接的包版本恰满足 semver 范围（如 0.1.0 满足 ^0.1.0）时，改 package.json 后 `npm install` 不会重解析——须显式 `npm install starlight-ai-actions@^0.1.0` 强制落 registry。
 - **门槛测试夹具勿露公网**：guides/index-page 两夹具页曾随 demo 文档站化混进 sidebar（2026-10-09 删）；新夹具页放 sidebar 之前先想清楚它是内容还是验证桩。
