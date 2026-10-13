@@ -24,6 +24,7 @@
 - **npm 0.2.0（2026-10-10）**：对话框补 DeepSeek 按钮（豆包与千问中间，终序 Gemini/Copilot/Poe/豆包/DeepSeek/千问/元宝 7 枚；icon=lobe-icons DeepSeek/Color 入 sprite；预填矩阵无 DeepSeek 行=纯跳转 chat.deepseek.com）。单测 37/37。demo 依赖随之 `^0.2.0`（registry 形态）。
 - **npm 0.2.1（2026-10-10 实发）**：npm 元数据补全——`homepage=https://www.xianmi.co/starlight-ai-actions/`（教程页）+ `bugs`（repository 原有）；README 正文补「Born from 显密文库 xianmi.co」一行（站链 `https://www.xianmi.co/`）。**rel 实证（webbridge）**：README 正文 xianmi 链 `nofollow`；侧栏 Homepage/Repository 均 `noopener noreferrer nofollow`；可跟进的只有 README 内 github.com 链与侧栏 issues/pulls。
 - **官方收录 PR（已 merge）**：[withastro/starlight#4254](https://github.com/withastro/starlight/pull/4254)（`docs: add starlight-ai-actions to community plugins`，2026-10-09 提交、2026-10-10 复核已 Merged；★归因：preview worker 用 gh 提交）。listing href=`https://www.xianmi.co/starlight-ai-actions/`（本仓 worker 服务）；PR 描述写明 official docs page + MIT + 商标注记。
+- **官方插件页分区修正 PR**：[withastro/starlight#4271](https://github.com/withastro/starlight/pull/4271)（`Move starlight-ai-actions to community plugins section`，2026-10-13；★preview worker 经 gh Contents API 提交——整仓 clone 过慢，单文件改动走 API 建分支+提交更省）。事由：#4254 把条目落在 Community tools and integrations 区末，但本包是标准 Starlight 插件（`plugins` 配置接入、注入组件与路由），与 tools 区（CLI/VSCode 扩展）不同类；PR 仅移动条目，href/title/description 原文不动。
 
 ## 已踩过的坑（部署/依赖）
 
