@@ -13,4 +13,9 @@ describe('mergeLabels', () => {
     expect(mergeLabels('zh-CN', { 'zh-CN': { view: '看 MD' } }).view).toBe('看 MD');
     expect(mergeLabels('zh-CN', { 'zh-CN': { view: '看 MD' } }).copyUrl).toBe(DEFAULT_LABELS['zh-CN'].copyUrl);
   });
+  it('mdMenu 三语缺省为裸 Markdown（0.2.2 精简，用户拍板去「工具」）', () => {
+    expect(DEFAULT_LABELS.en.mdMenu).toBe('Markdown');
+    expect(DEFAULT_LABELS['zh-CN'].mdMenu).toBe('Markdown');
+    expect(DEFAULT_LABELS['zh-TW'].mdMenu).toBe('Markdown');
+  });
 });
