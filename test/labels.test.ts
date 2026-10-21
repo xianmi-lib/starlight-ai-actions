@@ -19,3 +19,16 @@ describe('mergeLabels', () => {
     expect(DEFAULT_LABELS['zh-TW'].mdMenu).toBe('Markdown');
   });
 });
+
+describe('mergeLabels 附录回归（2026-10-21）', () => {
+  it('overrides 显式 undefined 不抹掉默认值', () => {
+    const merged = mergeLabels('zh-CN', { 'zh-CN': { view: undefined } });
+    expect(merged.view).toBe(DEFAULT_LABELS['zh-CN'].view);
+    expect(merged.copyUrl).toBe(DEFAULT_LABELS['zh-CN'].copyUrl);
+  });
+  it('undefined 与有效覆盖混排：有效键生效、undefined 键保留默认', () => {
+    const merged = mergeLabels('en', { en: { view: 'See MD', copyUrl: undefined } });
+    expect(merged.view).toBe('See MD');
+    expect(merged.copyUrl).toBe(DEFAULT_LABELS.en.copyUrl);
+  });
+});

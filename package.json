@@ -1,6 +1,6 @@
 {
   "name": "starlight-ai-actions",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Starlight page actions: Markdown tools menu and AI-discuss buttons with a paste-prompt dialog.",
   "homepage": "https://www.xianmi.co/starlight-ai-actions/",
   "type": "module",

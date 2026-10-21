@@ -73,6 +73,9 @@ const hint1 = options.dialog === false ? '' : (options.dialog?.hint1 ?? labels.d
       viewLink?.addEventListener('click', () => {
         dispatchAiAction({ type: 'markdown', action: 'view', url: mdMenu.dataset.mdHref, page: page() });
       });
+      // 连点竞态防护：旧定时器晚于新点击触发时会把「已复制 ✓」当原文恢复回去（卡死在成功态）——
+      // 原文只在首次点击记录（dataset.origText），新点击清掉旧 timer
+      const copyTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
       for (const item of mdMenu.querySelectorAll<HTMLButtonElement>('.pa-md-item[data-copy]')) {
         item.addEventListener('click', async () => {
           const kind = item.dataset.copy;
@@ -97,13 +100,20 @@ const hint1 = options.dialog === false ? '' : (options.dialog?.hint1 ?? labels.d
           const okText = root.dataset.copySuccess ?? '';
           const failText = root.dataset.copyFail ?? '';
           const label = item.querySelector<HTMLElement>('span') ?? item;
-          const orig = label.textContent ?? '';
+          if (!label.dataset.origText) label.dataset.origText = label.textContent ?? '';
+          const prevTimer = copyTimers.get(label);
+          if (prevTimer) clearTimeout(prevTimer);
           label.textContent = ok ? okText : failText;
           if (live) live.textContent = ok ? okText : failText;
-          setTimeout(() => {
-            label.textContent = orig;
-            if (live) live.textContent = '';
-          }, 1600);
+          copyTimers.set(
+            label,
+            setTimeout(() => {
+              label.textContent = label.dataset.origText ?? '';
+              delete label.dataset.origText;
+              copyTimers.delete(label);
+              if (live) live.textContent = '';
+            }, 1600),
+          );
         });
       }
       document.addEventListener('click', (e) => {

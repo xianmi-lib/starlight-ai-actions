@@ -44,5 +44,9 @@ export const DEFAULT_LABELS: Record<'en' | 'zh-CN' | 'zh-TW', Labels> = {
 
 export function mergeLabels(lang: string, overrides?: Record<string, Partial<Labels>>): Labels {
   const base: Labels = DEFAULT_LABELS[lang as keyof typeof DEFAULT_LABELS] ?? DEFAULT_LABELS.en;
-  return { ...base, ...(overrides?.[lang] ?? {}) };
+  const o = overrides?.[lang];
+  if (!o) return { ...base };
+  // 显式 undefined 不算覆盖：直接展开会把默认值静默抹成 undefined
+  const clean = Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined)) as Partial<Labels>;
+  return { ...base, ...clean };
 }

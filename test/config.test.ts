@@ -156,3 +156,13 @@ describe('DeepSeek 按钮（2026-10-10 用户拍板补入）', () => {
     expect(ds.name).toBe('DeepSeek');
   });
 });
+
+describe("prompt: '' 归一（2026-10-21 附录：falsy vs ?? 判定不一致）", () => {
+  it("validateOptions 把空串归一为缺省（与 resolvePrompt 的 falsy 判定一致）", () => {
+    const o = validateOptions({ prompt: '', markdown: { mdUrl: '/md/{filePath}' } });
+    expect(o.prompt).toBeUndefined();
+  });
+  it("prompt:'' 时 {url} 依赖按缺省模板计（含 {url}）——无 mdUrl 仍抛", () => {
+    expect(() => validateOptions({ prompt: '', paste: ['ChatGPT'] })).toThrow(/mdUrl/);
+  });
+});

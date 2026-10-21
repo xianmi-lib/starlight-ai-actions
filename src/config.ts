@@ -55,8 +55,9 @@ export function validateOptions(raw: unknown): StarlightAiActionsOptions {
   const direct = o.direct === false ? false : (o.direct ?? DEFAULT_DIRECT);
   const paste = o.paste === false ? false : (o.paste ?? DEFAULT_PASTE);
   const dialog = o.dialog === false ? false : (o.dialog ?? {});
-  // prompt 可缺省（缺省由 resolvePrompt 按页面语言取 DEFAULT_PROMPTS）；校验 {url} 依赖时按缺省模板（恒含 {url}）计
-  const prompt = o.prompt;
+  // prompt 可缺省（缺省由 resolvePrompt 按页面语言取 DEFAULT_PROMPTS）；校验 {url} 依赖时按缺省模板（恒含 {url}）计。
+  // 空串归一为缺省：resolvePrompt 用 falsy 判定（'' 走缺省），这里若用 ?? 会把 '' 当有效模板——两处判定必须一致
+  const prompt = o.prompt || undefined;
   const where = o.where ?? {};
   // prompt 模板仅在有按钮会渲染它（direct/paste 非空）时才构成对 {url} 的依赖；三组全关时 prompt 无处渲染，不应反向要求 mdUrl
   const promptUsed = (direct !== false && direct.length > 0) || (paste !== false && paste.length > 0);
