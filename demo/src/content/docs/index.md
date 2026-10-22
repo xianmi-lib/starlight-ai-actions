@@ -44,7 +44,7 @@ export default defineConfig({
 });
 ```
 
-The plugin takes over Starlight's `PageTitle` component to render the bar. If you also override `PageTitle` yourself, your override wins — render `AiActionsBar` from `starlight-ai-actions/AiActionsBar.astro` inside your own component if you need both.
+The plugin takes over Starlight's `PageTitle` component to render the bar. If you also override `PageTitle` yourself, your override wins — render `AiActionsBar` from `starlight-ai-actions/AiActionsBar.astro` inside your own component if you need both. `AiActionsBar` is self-contained: it bundles the button bar, the paste dialog, and all client-side behavior (copy actions, dialog wiring, `ai-actions` events), so no extra wiring is needed. Use the prop wiring in the plugin's own `PageTitle.astro` source as your starting point.
 
 ### 2. Allow the `aiActions` frontmatter key
 

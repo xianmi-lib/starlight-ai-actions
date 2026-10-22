@@ -4,7 +4,7 @@
 
 ## 仓库结构
 
-- `src/`：插件本体。`index.ts`（Starlight 插件，`config:setup` 覆盖 `PageTitle` + 配置经虚拟模块过桥）、`config.ts`（模板渲染/门槛判定）、`schema.ts`（`aiActionsSchema()` frontmatter 扩展）、`labels.ts`（en/zh-CN/zh-TW 三语缺省）、`events.ts`（`ai-actions` CustomEvent detail）、`components/`（PageTitle/AiActionsBar/AiDialog/AiIcon）、`libs/vite.ts`（虚拟模块桥，机制照抄 starlight-sidebar-topics 0.9.0）。
+- `src/`：插件本体。`index.ts`（Starlight 插件，`config:setup` 覆盖 `PageTitle` + 配置经虚拟模块过桥）、`config.ts`（模板渲染/门槛判定）、`schema.ts`（`aiActionsSchema()` frontmatter 扩展）、`labels.ts`（en/zh-CN/zh-TW 三语缺省）、`events.ts`（`ai-actions` CustomEvent detail）、`components/`（**2026-10-22 重构**：`AiActionsBar`=按钮条+`AiDialog` 渲染+客户端 `<script>` 全自带——文档配方「覆盖 PageTitle 后自渲染 AiActionsBar」此前只能得到半死按钮（script/AiDialog 只在插件 PageTitle 内、AiDialog 未导出），下移后覆盖方按文档即得全功能；`PageTitle`=装配薄壳；`AiDialog`/`AiIcon` 为内部件不进 exports）、`libs/vite.ts`（虚拟模块桥，机制照抄 starlight-sidebar-topics 0.9.0）。
 - `test/`：vitest 单测（配置合并、prompt 模板、门槛判定、frontmatter、事件）。
 - `demo/`：**demo 兼文档站**（教程页宿主、截图与共存回归场）。
 - `scripts/check-overflow.mjs` 五档宽溢出门禁、`demo/scripts/smoke.mjs` Playwright 行为冒烟。
