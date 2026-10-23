@@ -22,10 +22,13 @@ export const DEFAULT_PROMPTS: Record<'en' | 'zh-CN' | 'zh-TW', string> = {
   'zh-TW': '我在閱讀這篇文章（Markdown 格式）：{url}。請先全文閱讀，然後幫助我理解內容，並準備回答我的相關問題。',
 };
 
-// 选择序：frontmatter 逐页 > options.prompt 全局 > 按语言缺省（lang 精确命中，回退 en——与 mergeLabels 同款）
+// 选择序：frontmatter 逐页 > options.prompt 全局 > 按语言缺省（lang 精确命中，回退 en——与 mergeLabels 同款）。
+// 空白串（含纯空格/制表）视同未提供：先 trim 再判，防止 ' ' 模板拼出 ?prompt=%20 并误判 {url} 依赖
 export function resolvePrompt(fmPrompt: string | undefined, optionPrompt: string | undefined, lang: string): string {
-  if (fmPrompt) return fmPrompt;
-  if (optionPrompt) return optionPrompt;
+  const fm = fmPrompt?.trim();
+  if (fm) return fm;
+  const opt = optionPrompt?.trim();
+  if (opt) return opt;
   return DEFAULT_PROMPTS[lang as keyof typeof DEFAULT_PROMPTS] ?? DEFAULT_PROMPTS.en;
 }
 
@@ -56,9 +59,17 @@ export function validateOptions(raw: unknown): StarlightAiActionsOptions {
   const paste = o.paste === false ? false : (o.paste ?? DEFAULT_PASTE);
   const dialog = o.dialog === false ? false : (o.dialog ?? {});
   // prompt 可缺省（缺省由 resolvePrompt 按页面语言取 DEFAULT_PROMPTS）；校验 {url} 依赖时按缺省模板（恒含 {url}）计。
-  // 空串归一为缺省：resolvePrompt 用 falsy 判定（'' 走缺省），这里若用 ?? 会把 '' 当有效模板——两处判定必须一致
-  const prompt = o.prompt || undefined;
+  // 空串/纯空白串归一为缺省：trim 后 falsy 判定（'' 与 '   ' 都走缺省），与 resolvePrompt 的 trim 判定保持一致
+  const prompt = o.prompt?.trim() || undefined;
   const where = o.where ?? {};
+  // idPattern 在构建期预检（2026-10-22 review P2）：非法正则裸 SyntaxError 无指路，包一层插件前缀报错
+  if (where.idPattern) {
+    try {
+      new RegExp(where.idPattern);
+    } catch {
+      throw new Error(`[starlight-ai-actions] Invalid \`where.idPattern\` (not a valid RegExp): ${where.idPattern}`);
+    }
+  }
   // prompt 模板仅在有按钮会渲染它（direct/paste 非空）时才构成对 {url} 的依赖；三组全关时 prompt 无处渲染，不应反向要求 mdUrl
   const promptUsed = (direct !== false && direct.length > 0) || (paste !== false && paste.length > 0);
   const usesUrl =

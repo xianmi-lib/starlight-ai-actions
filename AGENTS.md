@@ -1,6 +1,6 @@
 # AGENTS.md — starlight-ai-actions
 
-开源 Starlight 插件（页标题下的 AI 按钮组：Markdown 工具菜单 + ChatGPT/Claude 预填讨论 + 粘贴 prompt 对话框），面向社区。源于显密文库项目（`../AGENTS.md` 有项目群全貌），但本仓库是**独立通用项目**，代码与文档不引用本站私货。
+开源 Starlight 插件（页标题下的 AI 按钮组：Markdown 工具菜单 + ChatGPT/Claude 预填讨论 + 粘贴 prompt 对话框），面向社区。源于显密文库项目（www.xianmi.co），但本仓库是**独立通用项目**，代码与文档不引用本站私货。
 
 ## 仓库结构
 
@@ -23,6 +23,9 @@
 - **npm 0.1.0（2026-10-09 首发）**：`npm publish --access public` 成功（16 文件）。token 在用户侧 `~/.npmrc`，值不落任何文件。**坑两条**：①本机 npm 走 registry 会遇自签证书注入（`DEPTH_ZERO_SELF_SIGNED_CERT`），解法=`NODE_OPTIONS=--use-system-ca`（走系统 CA，勿关 TLS 校验）；②granular token 若只授权既有三包，新包首发报 403 "You may not perform that action with these credentials"——需用户在 npm 站给 token 加包权限/开 create new packages。publish 成功后 `npm view` 约 1–2 分钟才转绿。
 - **npm 0.2.0（2026-10-10）**：对话框补 DeepSeek 按钮（豆包与千问中间，终序 Gemini/Copilot/Poe/豆包/DeepSeek/千问/元宝 7 枚；icon=lobe-icons DeepSeek/Color 入 sprite；预填矩阵无 DeepSeek 行=纯跳转 chat.deepseek.com）。单测 37/37。demo 依赖随之 `^0.2.0`（registry 形态）。
 - **npm 0.2.1（2026-10-10 实发）**：npm 元数据补全——`homepage=https://www.xianmi.co/starlight-ai-actions/`（教程页）+ `bugs`（repository 原有）；README 正文补「Born from 显密文库 xianmi.co」一行（站链 `https://www.xianmi.co/`）。**rel 实证（webbridge）**：README 正文 xianmi 链 `nofollow`；侧栏 Homepage/Repository 均 `noopener noreferrer nofollow`；可跟进的只有 README 内 github.com 链与侧栏 issues/pulls。
+- **npm 0.2.2（2026-10-20）**：mdMenu 三语缺省精简为裸 `Markdown`（labels.test 三语钉住断言）。
+- **npm 0.2.3（2026-10-21）**：附录修复批——prompt 空串归一、复制反馈定时器竞态、labels undefined 覆盖过滤，单测绿。
+- **版本记录**：对外版本史=仓根 `CHANGELOG.md`（npm 自动随 tarball 发布，包页可见）；本节只留发布坑与流程，版本内容不在此复写。
 - **官方收录 PR（已 merge）**：[withastro/starlight#4254](https://github.com/withastro/starlight/pull/4254)（`docs: add starlight-ai-actions to community plugins`，2026-10-09 提交、2026-10-10 复核已 Merged；由维护端用 gh 提交）。listing href=`https://www.xianmi.co/starlight-ai-actions/`（本仓 worker 服务）；PR 描述写明 official docs page + MIT + 商标注记。
 - **官方插件页分区修正 PR**：[withastro/starlight#4271](https://github.com/withastro/starlight/pull/4271)（`Move starlight-ai-actions to community plugins section`，2026-10-13；经 gh Contents API 提交——整仓 clone 过慢，单文件改动走 API 建分支+提交更省）。事由：#4254 把条目落在 Community tools and integrations 区末，但本包是标准 Starlight 插件（`plugins` 配置接入、注入组件与路由），与 tools 区（CLI/VSCode 扩展）不同类；PR 仅移动条目，href/title/description 原文不动。
 

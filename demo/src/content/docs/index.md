@@ -109,7 +109,7 @@ Each entry: `{ name, href, icon, iconUrl?, style?, bg?, scale?, ring? }`.
 | --- | --- |
 | `name` | Visible label (and `aria-label`) — a `string` (same name in all languages) or a per-language map `{ en: 'Doubao', 'zh-CN': '豆包' }`. |
 | `href` | Target URL. `{prompt}` and `{url}` are substituted, URL-encoded. |
-| `icon` | Built-in sprite id: `chatgpt`, `claude`, `gemini`, `copilot`, `poe`, `qwen`, `yuanbao`, `markdown`, `copy`, `link`, `external`, `commentAlt`, `caret`, `close`. Or use `icon: 'custom'` with `iconUrl`. |
+| `icon` | Built-in sprite id: `chatgpt`, `claude`, `gemini`, `copilot`, `poe`, `deepseek`, `qwen`, `yuanbao`, `markdown`, `copy`, `link`, `external`, `commentAlt`, `caret`, `close`. Or use `icon: 'custom'` with `iconUrl`. |
 | `style` | `combine` (icon + wordmark, like the built-in ChatGPT/Claude), `round`, or `square` (avatar buttons). Defaults to `round`. |
 | `bg`, `scale`, `ring` | Avatar look, applied to the `<img>` path only (bitmap or `iconUrl`). Use `bg: 'transparent'` for flat logos in `combine` style. |
 
@@ -198,6 +198,7 @@ aiActions: false
 - `bg` / `scale` / `ring` apply to avatar images only; sprite glyphs are flat.
 - `style: 'square'` currently renders the round avatar.
 - If `markdown` is disabled (or `items: []`) but a prompt or `href` still needs `{url}`, provide the URL anyway with `markdown: { items: [], mdUrl: '…' }`.
+- No `<ClientRouter />` (View Transitions) support yet: button behavior is wired once on first page load, so pages reached via client-side navigation render a bar without working buttons. A full page load restores behavior.
 
 ## License
 

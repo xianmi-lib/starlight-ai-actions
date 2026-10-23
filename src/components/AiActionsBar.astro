@@ -158,7 +158,8 @@ const hasAnyGroup = markdownItems.length > 0 || (direct !== false && direct.leng
           const okText = root.dataset.copySuccess ?? '';
           const failText = root.dataset.copyFail ?? '';
           const label = item.querySelector<HTMLElement>('span') ?? item;
-          if (!label.dataset.origText) label.dataset.origText = label.textContent ?? '';
+          // 用 === undefined 判首次：原文若是空串（labels 覆盖成 ''），falsy 判定会把成功文案误记为原文、卡死在成功态
+          if (label.dataset.origText === undefined) label.dataset.origText = label.textContent ?? '';
           const prevTimer = copyTimers.get(label);
           if (prevTimer) clearTimeout(prevTimer);
           label.textContent = ok ? okText : failText;

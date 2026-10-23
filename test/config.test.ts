@@ -165,4 +165,16 @@ describe("prompt: '' 归一（2026-10-21 附录：falsy vs ?? 判定不一致）
   it("prompt:'' 时 {url} 依赖按缺省模板计（含 {url}）——无 mdUrl 仍抛", () => {
     expect(() => validateOptions({ prompt: '', paste: ['ChatGPT'] })).toThrow(/mdUrl/);
   });
+  it("纯空白串与空串同归一（2026-10-22 review P2：trim 缺口）", () => {
+    const o = validateOptions({ prompt: '   ', markdown: { mdUrl: '/md/{filePath}' } });
+    expect(o.prompt).toBeUndefined();
+    expect(() => validateOptions({ prompt: ' \t ', paste: ['ChatGPT'] })).toThrow(/mdUrl/);
+  });
+  it("resolvePrompt 对 frontmatter/全局纯空白串落语言缺省模板", () => {
+    expect(resolvePrompt('  ', undefined, 'zh-CN')).toBe(DEFAULT_PROMPTS['zh-CN']);
+    expect(resolvePrompt(undefined, ' \t ', 'en')).toBe(DEFAULT_PROMPTS.en);
+  });
+  it("where.idPattern 非法正则抛 [starlight-ai-actions] 前缀错误（2026-10-22 review P2）", () => {
+    expect(() => validateOptions({ where: { idPattern: '([unclosed' } })).toThrow(/^\[starlight-ai-actions\] Invalid `where\.idPattern`/);
+  });
 });
